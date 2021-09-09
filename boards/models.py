@@ -1,10 +1,10 @@
 from django.utils import timezone
 from django.db import models
 from django.conf import settings
-from django.contrib.auth import get_user_model
+from froala_editor.fields import FroalaField
+
 
 User = settings.AUTH_USER_MODEL
-# User = get_user_model()
 
 
 class Category(models.Model):
@@ -27,7 +27,10 @@ class Category(models.Model):
 
 class Post(models.Model):
     title = models.CharField(max_length=128, null=True, blank=False)
-    content = models.TextField(null=True, blank=False)
+    # content = models.TextField(null=True, blank=False)
+    content = FroalaField(plugins=('font_size', 'font_family'), null=True, blank=True, options={
+        'toolbarInline': True,
+    })
     thumbnail = models.ImageField(upload_to='post_thumbnail/', null=True, blank=True)
     hits = models.PositiveIntegerField(default=0)
     created_date = models.DateTimeField(default=timezone.now)

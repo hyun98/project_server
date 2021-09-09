@@ -56,6 +56,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     
+    'froala_editor',
+    
     'rest_framework',
     
     'corsheaders',
@@ -216,3 +218,11 @@ GOOGLE_OAUTH2_CLIENT_SECRET = env.str('DJANGO_GOOGLE_OAUTH2_CLIENT_SECRET')
 NAVER_OAUTH2_CLIENT_ID = env.str('DJANGO_NAVER_OAUTH2_CLIENT_ID')
 NAVER_OAUTH2_CLIENT_SECRET = env.str('DJANGO_NAVER_OAUTH2_CLIENT_SECRET')
 KAKAO_REST_API_KEY = env.str('DJANGO_KAKAO_REST_API_KEY')
+
+
+FROALA_EDITOR_PLUGINS = ('align', 'char_counter', 'code_beautifier' ,'code_view', 'colors', 'draggable', 'emoticons',
+        'entities', 'file', 'font_family', 'font_size', 'fullscreen', 'image_manager', 'image', 'inline_style',
+        'line_breaker', 'link', 'lists', 'paragraph_format', 'paragraph_style', 'quick_insert', 'quote', 'save', 'table',
+        'url', 'video')
+
+FRAOLA_EDITOR_THIRD_PARTY = ('image_aviary', 'spell_checker')

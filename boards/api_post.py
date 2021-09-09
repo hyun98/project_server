@@ -10,6 +10,7 @@ from boards.serializers import PostDetailSerializer
 from boards.models import Category, Post
 
 
+
 class PostCreateApi(ApiAuthMixin, APIView):
     def post(self, request, *args, **kwargs):
         """
