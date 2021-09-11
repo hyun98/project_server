@@ -33,10 +33,6 @@ environ.Env.read_env(
 SECRET_KEY = env('SECRET_KEY')
 REFRESH_TOKEN_SECRET = env('REFRESH_TOKEN_SECRET')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ['*']
 
 BASE_BACKEND_URL = env.str('DJANGO_BASE_BACKEND_URL', default='http://localhost:8000')
 BASE_FRONTEND_URL = env.str('DJANGO_BASE_FRONTEND_URL', default='http://localhost:3000')
@@ -113,29 +109,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
-# ---deploy database format---
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'quant',
-#         'USER': 'root',
-#         'PASSWORD': env('MARIADB_ROOT_PASSWORD'),
-#         'HOST': 'mariadb',
-#         'PORT': '3306',
-#     }
-# }
 
 
 # Password validation
@@ -219,10 +192,3 @@ NAVER_OAUTH2_CLIENT_ID = env.str('DJANGO_NAVER_OAUTH2_CLIENT_ID')
 NAVER_OAUTH2_CLIENT_SECRET = env.str('DJANGO_NAVER_OAUTH2_CLIENT_SECRET')
 KAKAO_REST_API_KEY = env.str('DJANGO_KAKAO_REST_API_KEY')
 
-
-FROALA_EDITOR_PLUGINS = ('align', 'char_counter', 'code_beautifier' ,'code_view', 'colors', 'draggable', 'emoticons',
-        'entities', 'file', 'font_family', 'font_size', 'fullscreen', 'image_manager', 'image', 'inline_style',
-        'line_breaker', 'link', 'lists', 'paragraph_format', 'paragraph_style', 'quick_insert', 'quote', 'save', 'table',
-        'url', 'video')
-
-FRAOLA_EDITOR_THIRD_PARTY = ('image_aviary', 'spell_checker')

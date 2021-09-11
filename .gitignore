@@ -2,6 +2,13 @@
 # Created by https://www.toptal.com/developers/gitignore/api/macos,django,python,visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos,django,python,visualstudiocode
 
+### Deploy ###
+nginx.conf
+docker-compose.yml
+server.Dockerfile
+project.crt
+project.key
+
 ### Django ###
 *.log
 *.pot
