@@ -22,7 +22,7 @@ DATABASES = {
         'NAME': 'projectdb',
         'USER': 'project',
         'PASSWORD': read_secret('PROJECT_MARIADB_PASSWORD'),
-        'HOST': 'projectdb',
+        'HOST': 'projectmariadb',
         'PORT': '3306',
     }
 }
