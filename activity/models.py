@@ -1,7 +1,6 @@
 from django.db import models
 
 
-
 class Activity(models.Model):
     title = models.CharField(max_length=128)
     description = models.TextField()
@@ -35,12 +34,12 @@ class ActivityDetail(models.Model):
 class ActivityDetailImage(models.Model):
     image = models.ImageField(upload_to='activity_detail', null=True, blank=True)
     datetime = models.DateTimeField(auto_now_add=True)
-    
+    order = models.PositiveIntegerField(default=0, null=True)
     activity_detail = models.ForeignKey(ActivityDetail, on_delete=models.CASCADE)
     
     class Meta:
         verbose_name = '활동 사진'
         verbose_name_plural = '활동 사진 모음'
-        ordering = ['datetime', ]
+        ordering = ['order', ]
         
     

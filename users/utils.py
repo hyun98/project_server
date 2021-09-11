@@ -19,17 +19,17 @@ def user_create(username, password=None, **extra_fields):
     user.full_clean()
     user.save()
     
-    profile = Profile(user=user, nickname=username)
+    profile = Profile(user=user)
     
     try:
         profile.image = extra_fields['image']
     except:
         pass
     
-    try:
-        profile.nickname = extra_fields['nickname']
-    except:
-        pass
+    if extra_fields['nickname'] == '':
+       profile.nickname = username
+    else:
+       profile.nickname = extra_fields['nickname']
     
     try:
         try:

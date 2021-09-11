@@ -1,3 +1,4 @@
+from api.mixins import PublicApiMixin
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -7,7 +8,7 @@ from django.shortcuts import get_object_or_404
 from activity.models import Activity, ActivityDetail, ActivityDetailImage
 
 
-class ActivityReadApi(APIView):
+class ActivityReadApi(PublicApiMixin, APIView):
     def get(self, request, *args, **kwargs):
         data_list = []
         
@@ -40,7 +41,7 @@ class ActivityReadApi(APIView):
         return Response(data, status=status.HTTP_200_OK)
     
 
-class ActivityDetailApi(APIView):
+class ActivityDetailApi(PublicApiMixin, APIView):
     def get(self, request, *args, **kwargs):
         id = kwargs['id']
         activity = get_object_or_404(Activity, id=id)
@@ -68,7 +69,7 @@ class ActivityDetailApi(APIView):
         return Response(data, status=status.HTTP_200_OK)
             
         
-class ActivityDetailImageApi(APIView):
+class ActivityDetailImageApi(PublicApiMixin, APIView):
     def get(self, request, *args, **kwargs):
         detail_id = kwargs['detail_id']
         activity_detail = get_object_or_404(ActivityDetail, id=detail_id)

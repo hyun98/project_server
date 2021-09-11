@@ -160,10 +160,11 @@ def jwt_login(response, user):
     
     data = {
         'access_token': access_token,
+        'refresh_token': refresh_token,
     }
     
     response.data = data
-    response.set_cookie(key="refreshtoken", value=refresh_token, httponly=True)
+    # response.set_cookie(key="refreshtoken", value=refresh_token, httponly=True)
     
     user_record_login(user)
     

@@ -6,7 +6,9 @@ from django.contrib.auth import get_user_model
 from users.models import Profile
 from boards.serializers import PostListSerializer, CategorySerializer
 
+
 User = get_user_model()
+
 
 class ProfileSerializer(serializers.ModelSerializer):
     favorite_category = CategorySerializer(read_only=True, many=True)
@@ -30,8 +32,6 @@ class ProfileSerializer(serializers.ModelSerializer):
     def get_favorite_category(self, obj):
         return obj.favorite_category.all()
     
-    def get_favorite_company(self, obj):
-        return obj.favorite_company.all()
         
 
 class UserSerializer(serializers.ModelSerializer):

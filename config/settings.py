@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'activity',
     'users',
     'boards',
+    'FAQs',
     
     'django.contrib.admin',
     'django.contrib.auth',
@@ -56,9 +57,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     
-    'froala_editor',
-    
     'rest_framework',
+    'django_extensions',
     
     'corsheaders',
     
