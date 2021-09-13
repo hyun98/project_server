@@ -20,6 +20,10 @@ User = get_user_model()
 @method_decorator(ensure_csrf_cookie, name="dispatch")
 class LoginApi(PublicApiMixin, APIView):
     def post(self, request, *args, **kwargs):
+        """
+        username 과 password를 가지고 login 시도
+        key값 : username, password
+        """
         user = User
         username = request.data.get('username')
         password = request.data.get('password')
