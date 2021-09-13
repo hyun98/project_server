@@ -3,15 +3,18 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
 
-from api.mixins import ApiAuthMixin
+from api.mixins import ApiAuthMixin, PublicApiMixin
 
 from boards.serializers import PostDetailSerializer
 from boards.models import Category, Post
+from users.models import User
 
 
 
-class PostCreateApi(ApiAuthMixin, APIView):
+# class PostCreateApi(ApiAuthMixin, APIView):
+class PostCreateApi(PublicApiMixin, APIView):
     def post(self, request, *args, **kwargs):
         """
         cate_id 게시판에 새로운 글을 작성한다.
@@ -28,8 +31,10 @@ class PostCreateApi(ApiAuthMixin, APIView):
                 "message": "title/content required"
             }, status=status.HTTP_400_BAD_REQUEST)
         
+        user = User.objects.get(username='admin')
+        
         post = Post(
-            creator=request.user, 
+            creator=user, 
             category=category,
             title=title,
             content=content,
