@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'boards',
     'FAQs',
     
+    'swagger',
+    
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -51,6 +53,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     
     'rest_framework',
+    'drf_yasg',
     'django_extensions',
     
     'corsheaders',
