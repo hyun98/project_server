@@ -106,6 +106,9 @@ class FindIDApi(PublicApiMixin, APIView):
 
 class SendPasswordEmailApi(PublicApiMixin, APIView):
     def post(self, request, *args, **kwargs):
+        """
+        비밀번호 변경 인증 코드 발송
+        """
         target_username = request.data.get('username', '')
         target_email = request.data.get('email', '')
         
@@ -120,7 +123,7 @@ class SendPasswordEmailApi(PublicApiMixin, APIView):
             target_user.profile.save()
             
             send_mail(
-                '[PROJECT:QUANT] 비밀번호 찾기 인증 메일입니다.',
+                '[PROJECT:HOME] 비밀번호 찾기 인증 메일입니다.',
                 recipient_list=[target_email],
                 html=render_to_string('recovery_email.html', {
                     'auth_string': auth_string,
@@ -138,6 +141,11 @@ class SendPasswordEmailApi(PublicApiMixin, APIView):
 
 class ConfirmPasswordEmailApi(PublicApiMixin, APIView):
     def post(self, request, *args, **kwagrs):
+        """
+        1. 인증 코드 확인
+        2. 해당 username으로 로그인
+        3. 
+        """
         target_username = request.data.get('username', '')
         target_code = request.data.get('code', '')
         user = User.objects.get(username=target_username)

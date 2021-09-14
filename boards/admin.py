@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 from django_summernote.admin import SummernoteModelAdminMixin, SummernoteModelAdmin
 
-from boards.models import Post, Category, Comment, Reply
+from boards.models import Post, Category, Comment, PostFile, Reply
 
 
 class CategoryInline(admin.StackedInline):
@@ -17,6 +17,11 @@ class PostInline(admin.StackedInline):
     model = Post
     can_delete = False
     verbose_name_plural = "posts"
+    
+class FileInline(admin.StackedInline):
+    model = PostFile
+    can_delete = False
+    verbose_name_plural = "files"
 
 class CommentInline(admin.StackedInline):
     model = Comment
@@ -65,7 +70,7 @@ class PostAdmin(SummernoteModelAdminMixin, admin.ModelAdmin):
     
     summernote_fields = ('content', )
     
-    inlines = (CommentInline, )
+    inlines = (CommentInline, FileInline, )
     
     def get_thumbnail_image(self, obj):
         image = obj.thumbnail

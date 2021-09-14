@@ -51,7 +51,6 @@ class LoginApi(PublicApiMixin, APIView):
 class RefreshJWTtoken(PublicApiMixin, APIView):
     def post(self, request, *args, **kwargs):
         refresh_token = request.COOKIES.get('refreshtoken')
-        # refresh_token = request.data.get('refresh_token')
         
         if refresh_token is None:
             return Response({

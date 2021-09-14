@@ -3,20 +3,26 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from django.shortcuts import get_object_or_404
-from django.contrib.auth import get_user_model
+from django.db import transaction
 
 from api.mixins import ApiAuthMixin, PublicApiMixin
 
 from boards.serializers import PostDetailSerializer
-from boards.models import Category, Post
+from boards.models import Category, Post, PostFile
 from users.models import User
 
 
 class PostCreateApi(ApiAuthMixin, APIView):
+    @transaction.atomic
     def post(self, request, *args, **kwargs):
         """
         cate_id 게시판에 새로운 글을 작성한다.
         title, content 필수
+        
+        첨부파일이 있는 경우
+        {
+            'upload_file': FILENAME
+        }
         """
         cate_id = kwargs['cate_id']
         category = get_object_or_404(Category, pk=cate_id)
@@ -36,10 +42,20 @@ class PostCreateApi(ApiAuthMixin, APIView):
             category=category,
             title=title,
             content=content,
-            thumbnail=request.data.get('thumbnail', '')
+            thumbnail=request.data.get('thumbnail', ''),
         )
         
         post.save()
+        
+        files = request.FILES.getlist('upload_files')
+        
+        for file in files:
+            postfile = PostFile(
+                upload_files=file,
+                filename=file.name,
+                post=post
+            )
+            postfile.save()
         
         return Response({
             "message": "Post created success"
