@@ -11,7 +11,7 @@ def read_secret(secret_name):
     return secret
 
 
-DEBUG = False
+DEBUG = True
 
 # 실제 배포시 바꿀 예정
 ALLOWED_HOSTS = ['*']
