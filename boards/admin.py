@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
-from django_summernote.admin import SummernoteModelAdminMixin, SummernoteModelAdmin
+from django_summernote.admin import SummernoteModelAdminMixin
 
 from boards.models import Post, Category, Comment, PostFile, Reply
 
