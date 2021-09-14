@@ -122,13 +122,19 @@ class SendPasswordEmailApi(PublicApiMixin, APIView):
             target_user.profile.auth = auth_string
             target_user.profile.save()
             
-            send_mail(
-                '[PROJECT:HOME] 비밀번호 찾기 인증 메일입니다.',
-                recipient_list=[target_email],
-                html=render_to_string('recovery_email.html', {
-                    'auth_string': auth_string,
-                })
-            )
+            try:
+                send_mail(
+                    '[PROJECT:HOME] 비밀번호 찾기 인증 메일입니다.',
+                    recipient_list=[target_email],
+                    html=render_to_string('recovery_email.html', {
+                        'auth_string': auth_string,
+                    })
+                )
+            except:
+                return Response({
+                    "message": "email error",
+                }, status=status.HTTP_400_BAD_REQUEST)
+                
             return Response({
                 "message": "Verification code sent"
             }, status=status.HTTP_200_OK)
