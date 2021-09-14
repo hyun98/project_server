@@ -50,8 +50,8 @@ class LoginApi(PublicApiMixin, APIView):
 @method_decorator(csrf_protect, name='dispatch')
 class RefreshJWTtoken(PublicApiMixin, APIView):
     def post(self, request, *args, **kwargs):
-        # refresh_token = request.COOKIES.get('refreshtoken')
-        refresh_token = request.data.get('refresh_token')
+        refresh_token = request.COOKIES.get('refreshtoken')
+        # refresh_token = request.data.get('refresh_token')
         
         if refresh_token is None:
             return Response({
@@ -83,7 +83,6 @@ class RefreshJWTtoken(PublicApiMixin, APIView):
         return Response(
             {
                 'access_token': access_token,
-                'refresh_token': refresh_token,
             }
         )
         
@@ -95,7 +94,7 @@ class LogoutApi(PublicApiMixin, APIView):
         response = Response({
             "message": "Logout success"
             }, status=status.HTTP_202_ACCEPTED)
-        # response.delete_cookie('refreshtoken')
+        response.delete_cookie('refreshtoken')
 
         return response
 

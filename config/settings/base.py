@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     
     'swagger',
     
+    'django_summernote',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -192,3 +194,9 @@ NAVER_OAUTH2_CLIENT_ID = env.str('DJANGO_NAVER_OAUTH2_CLIENT_ID')
 NAVER_OAUTH2_CLIENT_SECRET = env.str('DJANGO_NAVER_OAUTH2_CLIENT_SECRET')
 KAKAO_REST_API_KEY = env.str('DJANGO_KAKAO_REST_API_KEY')
 
+
+# Summernote Customize
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+SUMMERNOTE_CONFIG = {}
+SUMMERNOTE_THEME = 'bs4'

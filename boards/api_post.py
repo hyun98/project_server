@@ -12,9 +12,7 @@ from boards.models import Category, Post
 from users.models import User
 
 
-
-# class PostCreateApi(ApiAuthMixin, APIView):
-class PostCreateApi(PublicApiMixin, APIView):
+class PostCreateApi(ApiAuthMixin, APIView):
     def post(self, request, *args, **kwargs):
         """
         cate_id 게시판에 새로운 글을 작성한다.

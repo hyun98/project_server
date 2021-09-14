@@ -126,7 +126,7 @@ def generate_access_token(user):
     access_token_payload = {
         'user_id': user.id,
         'exp': datetime.datetime.utcnow() + datetime.timedelta(
-            days=0, minutes=5
+            days=0, minutes=60
         ),
         'iat': datetime.datetime.utcnow(),
     }
@@ -160,11 +160,10 @@ def jwt_login(response, user):
     
     data = {
         'access_token': access_token,
-        'refresh_token': refresh_token,
     }
     
     response.data = data
-    # response.set_cookie(key="refreshtoken", value=refresh_token, httponly=True)
+    response.set_cookie(key="refreshtoken", value=refresh_token, httponly=True)
     
     user_record_login(user)
     

@@ -3,6 +3,8 @@ from django.contrib import admin
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
+from django_summernote.admin import SummernoteModelAdminMixin, SummernoteModelAdmin
+
 from boards.models import Post, Category, Comment, Reply
 
 
@@ -48,18 +50,20 @@ class CategoryAdmin(admin.ModelAdmin):
 
 
 @admin.register(Post)
-class PostAdmin(admin.ModelAdmin):
+class PostAdmin(SummernoteModelAdminMixin, admin.ModelAdmin):
     ordering = ('-created_date', 'creator__profile__nickname')
     list_display = (
-        'get_thumbnail_image', 'category', 'title', 'content', 'get_creator', 'hits',
-        'top_fixed', 'get_creator',
+        'get_thumbnail_image', 'category', 'title', 'get_content', 'get_creator', 'hits',
+        'top_fixed', 'get_creator', 'created_date', 'modified_date',
     )
     list_display_links = (
-        'get_thumbnail_image', 'category', 'title', 'content', 'get_creator', 'hits',
-        'top_fixed', 'get_creator',
+        'get_thumbnail_image', 'category', 'title', 'get_content', 'get_creator', 'hits',
+        'top_fixed', 'get_creator', 'created_date', 'modified_date',
     )
     search_fields = ('created_date', 'creator__profile__nickname', 'title', 'category__title')
     list_filter = ('category__title', )
+    
+    summernote_fields = ('content', )
     
     inlines = (CommentInline, )
     
@@ -71,6 +75,10 @@ class PostAdmin(admin.ModelAdmin):
         return mark_safe(f'<img src="{image.url}" style="width: 50px;">')
     get_thumbnail_image.short_description = _('Thumbnail Image')
     
+    def get_content(self, obj):
+        content = obj.content[:50]
+        return content
+    get_content.short_description = _("content")
     
     def get_creator(self, obj):
         creator = obj.creator.profile.nickname
@@ -81,10 +89,10 @@ class PostAdmin(admin.ModelAdmin):
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
     list_display = (
-        'id', 'get_post', 'content', 'get_creator',
+        'id', 'get_post', 'get_content', 'get_creator',
     )
     list_display_links = (
-        'id', 'get_post', 'content', 'get_creator',
+        'id', 'get_post', 'get_content', 'get_creator',
     )
     search_fields = ('created_date', 'creator__profile__nickname', 'post__title')
     list_filter = ('post__title', )
@@ -95,6 +103,11 @@ class CommentAdmin(admin.ModelAdmin):
         creator = obj.creator.profile.nickname
         return creator
     get_creator.short_description = _("creator")
+    
+    def get_content(self, obj):
+        content = obj.content[:50]
+        return content
+    get_content.short_description = _("content")
     
     def get_post(self, obj):
         post = obj.post.title
