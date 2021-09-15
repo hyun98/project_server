@@ -50,7 +50,7 @@ class Post(models.Model):
     class Meta:
         verbose_name = '게시글'
         verbose_name_plural = '게시글 모음'
-        ordering = ['-category__title', ]
+        ordering = ['-created_date', ]
         
     def __str__(self):
         return self.title

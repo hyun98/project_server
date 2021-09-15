@@ -16,7 +16,7 @@ class Question(models.Model):
 
 class Answer(models.Model):
     answer = models.TextField(null=True)
-    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name="answer")
+    question = models.OneToOneField(Question, on_delete=models.CASCADE, related_name="answer")
    
     def __str__(self):
         return self.answer

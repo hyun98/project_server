@@ -1,7 +1,7 @@
 from django.urls import path, include
 
 from boards.api_category import CategoryCreateReadApi, CategoryManageApi
-from boards.api_post import PostCreateApi, PostManageApi
+from boards.api_post import PostCreateApi, PostManageApi, PostFileDownloadApi
 from boards.api_comment import CommentCreateApi, CommentManageApi
 from boards.api_reply import ReplyCreateApi, ReplyManageApi
 
@@ -31,5 +31,6 @@ urlpatterns = [
     path('', CategoryCreateReadApi.as_view(), name="category_create"),
     path('<int:cate_id>', CategoryManageApi.as_view(), name="category_manage"),
     path('<int:cate_id>/', include(post_urlpatterns)),
+    path('file/<int:file_id>', PostFileDownloadApi.as_view(), name="filedownload"),
     
 ]

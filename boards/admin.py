@@ -89,7 +89,24 @@ class PostAdmin(SummernoteModelAdminMixin, admin.ModelAdmin):
         creator = obj.creator.profile.nickname
         return creator
     get_creator.short_description = _("creator")
+
+
+@admin.register(PostFile)
+class PostFileAdmin(admin.ModelAdmin):
+    ordering = ('post__created_date', )
+    list_display = (
+        'id', 'filename', 'get_post_title',
+    )
+    list_display_links = (
+        'id', 'filename', 'get_post_title',
+    )
+    search_fields = ('get_post_title', )
+    list_filter = ('post__title', )
     
+    def get_post_title(self, obj):
+        return obj.post.title
+    get_post_title.short_description = _("post_title")
+
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):

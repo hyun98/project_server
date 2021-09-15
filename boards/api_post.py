@@ -1,7 +1,13 @@
+import urllib
+import os
+import mimetypes
+
 from rest_framework import status
+from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.db import transaction
 
@@ -34,11 +40,9 @@ class PostCreateApi(ApiAuthMixin, APIView):
             return Response({
                 "message": "title/content required"
             }, status=status.HTTP_400_BAD_REQUEST)
-        
-        user = User.objects.get(username='admin')
-        
+                
         post = Post(
-            creator=user, 
+            creator=request.user, 
             category=category,
             title=title,
             content=content,
@@ -60,6 +64,26 @@ class PostCreateApi(ApiAuthMixin, APIView):
         return Response({
             "message": "Post created success"
         }, status=status.HTTP_201_CREATED)
+
+
+class PostFileDownloadApi(PublicApiMixin, APIView):
+    def get(self, request, *args, **kwargs):
+        file = get_object_or_404(PostFile, pk=kwargs['file_id'])
+        
+        url = file.upload_files.url[1:]
+        file_url = urllib.parse.unquote(url)
+            
+        if os.path.exists(file_url):
+            with open(file_url, 'rb') as f:
+                quote_file_url = urllib.parse.quote(file.filename.encode('utf-8'))
+                response = HttpResponse(
+                    f.read(), content_type=mimetypes.guess_type(file_url)[0]
+                )
+                response['Content-Disposition'] = 'attachment;filename*=UTF-8\'\'%s' % quote_file_url
+                
+                return response
+        else:
+            raise NotFound
 
 
 class PostManageApi(ApiAuthMixin, APIView):
@@ -131,7 +155,7 @@ class PostManageApi(ApiAuthMixin, APIView):
             "message": "Post delete success"
         }, status=status.HTTP_204_NO_CONTENT)
     
-    
+    @transaction.atomic
     def put(self, request, *args, **kwargs):
         """
         글 수정 기능.
@@ -157,10 +181,21 @@ class PostManageApi(ApiAuthMixin, APIView):
         post.title = title
         post.content = content
         post.thumbnail = request.data.get('thumbnail', '')
-        
+                
         post.save()
+        
+        PostFile.objects.filter(post=post).delete()
+        
+        files = request.FILES.getlist('upload_files')
+        
+        for file in files:
+            postfile = PostFile(
+                upload_files=file,
+                filename=file.name,
+                post=post
+            )
+        postfile.save()
         
         return Response({
             "message": "Post update success"
         }, status=status.HTTP_201_CREATED)
-

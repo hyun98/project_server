@@ -18,7 +18,6 @@ class EmailThread(threading.Thread):
         threading.Thread.__init__(self)
     
     def run(self):
-        print(self.recipient_list)
         msg = EmailMultiAlternatives(
             self.subject, self.message, self.from_email, to=self.recipient_list)
         if self.html:
