@@ -2,12 +2,9 @@ from django.contrib import admin
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
+from django_summernote.admin import SummernoteModelAdminMixin
+
 from activity.models import Activity, ActivityDetail, ActivityDetailImage
-
-
-# admin.site.register(Activity)
-# admin.site.register(ActivityDetail)
-# admin.site.register(ActivityDetailImage)
 
 
 
@@ -52,7 +49,7 @@ class ActivityAdmin(admin.ModelAdmin):
 
 
 @admin.register(ActivityDetail)
-class ActivityDetailAdmin(admin.ModelAdmin):
+class ActivityDetailAdmin(SummernoteModelAdminMixin, admin.ModelAdmin):
     ordering = ('title', )
     list_display = (
         'get_thumbnail_image', 'activity', 'title', 'description',
@@ -62,6 +59,8 @@ class ActivityDetailAdmin(admin.ModelAdmin):
     )
     search_fields = ('title', 'activity__title')
     list_filter = ('activity__title', )
+    
+    summernote_fields = ('description', )
     
     inlines = (ActivityDetailImageInline, )
     
