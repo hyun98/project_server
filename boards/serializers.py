@@ -1,7 +1,8 @@
+from django.db.models import fields
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
-from boards.models import Category, Post, Comment, Reply
+from boards.models import Category, Post, Comment, PostFile, Reply
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -103,7 +104,16 @@ class CommentSerializer(serializers.ModelSerializer):
         return obj.favorite.all().count()
 
 
+class FileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PostFile
+        fields = (
+            'id', 'filename',
+        )
+
+
 class PostDetailSerializer(serializers.ModelSerializer):
+    postfile = FileSerializer(many=True, read_only=True)
     comment = CommentSerializer(many=True, read_only=True)
     thumbnail = serializers.SerializerMethodField(read_only=True)
     creator = serializers.SerializerMethodField(read_only=True)
@@ -113,7 +123,7 @@ class PostDetailSerializer(serializers.ModelSerializer):
         model = Post
         fields = (
             'id', 'thumbnail', 'title', 'content', 'hits', 'created_date', 
-            'modified_date', 'creator', 'favorite_count', 'comment',
+            'modified_date', 'creator', 'favorite_count', 'comment', 'postfile',
         )
     
     def get_creator(self, obj):
@@ -130,5 +140,5 @@ class PostDetailSerializer(serializers.ModelSerializer):
             return ''
     
     def get_favorite_count(self, obj):
-        return obj.favorite.all().count()
+        return obj.favorite_user.all().count()
     

@@ -13,7 +13,7 @@ from django.db import transaction
 
 from api.mixins import ApiAuthMixin, PublicApiMixin
 
-from boards.serializers import PostDetailSerializer
+from boards.serializers import PostDetailSerializer, FileSerializer
 from boards.models import Category, Post, PostFile
 from users.models import User
 
@@ -95,7 +95,7 @@ class PostManageApi(ApiAuthMixin, APIView):
         """
         pk = kwargs['post_id']
         post = get_object_or_404(Post, pk=pk)
-        serializer = PostDetailSerializer(post, many=False)
+        serializer = PostDetailSerializer(post)
         
         response = Response(serializer.data, status=status.HTTP_200_OK)
         
