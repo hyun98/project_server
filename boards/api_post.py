@@ -7,7 +7,7 @@ from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from django.http.response import HttpResponse
+from django.http.response import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.db import transaction
 
@@ -76,7 +76,7 @@ class PostFileDownloadApi(PublicApiMixin, APIView):
         if os.path.exists(file_url):
             with open(file_url, 'rb') as f:
                 quote_file_url = urllib.parse.quote(file.filename.encode('utf-8'))
-                response = HttpResponse(
+                response = JsonResponse(
                     f.read(), content_type=mimetypes.guess_type(file_url)[0]
                 )
                 response['Content-Disposition'] = 'attachment;filename*=UTF-8\'\'%s' % quote_file_url

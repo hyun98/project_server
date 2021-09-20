@@ -1,4 +1,13 @@
+from uuid import uuid4
+from datetime import datetime
+
 from django.db import models
+
+
+def get_file_path(instance, filename):
+    ymd_path = datetime.now().strftime('%Y/%m/%d')
+    uuid_name = uuid4().hex
+    return '/'.join(['activity_detail_file/', ymd_path, uuid_name])
 
 
 class Activity(models.Model):
@@ -19,6 +28,7 @@ class Activity(models.Model):
 class ActivityDetail(models.Model):
     title = models.CharField(max_length=128)
     image = models.ImageField(upload_to='activity_detail', null=True, blank=True)
+    activity_file = models.FileField(upload_to=get_file_path, null=True, blank=True, verbose_name='활동파일')
     description = models.TextField()
 
     activity = models.ForeignKey(Activity, on_delete=models.CASCADE)

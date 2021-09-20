@@ -1,9 +1,14 @@
+import os
+
 from api.mixins import PublicApiMixin
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from django.http.response import Http404
+from django.conf import settings
 from django.shortcuts import get_object_or_404
+from django.http import FileResponse
 
 from activity.models import Activity, ActivityDetail, ActivityDetailImage
 
@@ -88,4 +93,15 @@ class ActivityDetailImageApi(PublicApiMixin, APIView):
         
         return Response(data, status=status.HTTP_200_OK)
 
-        
+
+class ActivityFilesApi(PublicApiMixin, APIView):
+    def get(self, request, *args, **kwargs):
+        detail_id = kwargs['detail_id']
+        activity_detail = get_object_or_404(ActivityDetail, id=detail_id)
+        file_path = os.path.join(settings.MEDIA_ROOT, str(activity_detail.activity_file))
+
+        try:
+            return FileResponse(open(file_path, 'rb'), content_type='application/pdf')
+        except:
+            raise Http404()
+    
