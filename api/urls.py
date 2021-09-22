@@ -6,7 +6,8 @@ v1_patterns = [
     path('users/', include(('users.urls', 'users'))),
     path('board/', include(('boards.urls', 'boards'))),
     path('activity/', include(('activity.urls', 'activity'))),
-    path('FAQs/', include(('FAQs.urls', 'FAQs')))
+    path('FAQs/', include(('FAQs.urls', 'FAQs'))),
+    path('reservations/', include(('reservations.urls', 'reservations'))),
     
 ]
 
