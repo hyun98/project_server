@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'users',
     'boards',
     'FAQs',
+    'reservations',
     
     'swagger',
     
