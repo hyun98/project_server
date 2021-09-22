@@ -4,10 +4,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 
+from django.db import transaction
 
 from api.mixins import PublicApiMixin, ApiAuthMixin
 from reservations.models import Reservation
-
+from reservations.serializers import ReservationCreateSerializer
 
 # ApiAuthMixin으로 교체 필요
 # class ReserveCountApi(PublicApiMixin, APIView):
@@ -45,18 +46,22 @@ class ReserveApi(PublicApiMixin, APIView):
             
         }, status=status.HTTP_200_OK)
         
-    
+    @transaction.atomic
     def post(self, request, *args, **kwargs):
-        date = request.data.get('date')
-        start_time = request.data.get('start_time')
-        end_time = request.data.get('end_time')
-        title = request.date.get('title', '')
-        description = request
+        request.data['reserve_date'] = kwargs['date']
+        serializer = ReservationCreateSerializer(
+            data=request.data,
+            context={'request': self.request}
+        )
+        if not serializer.is_valid(raise_exception=True):
+            return Response({
+                "message": "Request Body Error"
+                }, status=status.HTTP_409_CONFLICT)
+
+        reservation = serializer.save()
         
-        
-        
-        
-    # def post(self, request, *args, **kwagrs):
-        
+        return Response({
+            "message": "Reservation completed"
+        }, status=status.HTTP_201_CREATED)
         
     
