@@ -13,7 +13,6 @@ User = get_user_model()
 class ReservationCreateSerializer(serializers.Serializer):
     title = serializers.CharField(write_only=True)
     description = serializers.CharField(write_only=True)
-    reserve_date = serializers.DateField(write_only=True)
     floor = serializers.IntegerField(write_only=True)
     start_time = serializers.TimeField(write_only=True)
     end_time = serializers.TimeField(write_only=True)
@@ -23,7 +22,7 @@ class ReservationCreateSerializer(serializers.Serializer):
         if start_time > end_time:
             raise serializers.ValidationError(_("The start time must precede the end time"))
         
-        reservations = Reservation.objects.filter(reserve_date=reserve_date)
+        reservations = Reservation.objects.filter(reserve_date=reserve_date, floor=floor)
         
         for rev in reservations:
             if end_time <= rev.start_time and rev.end_time <= start_time:
@@ -35,7 +34,7 @@ class ReservationCreateSerializer(serializers.Serializer):
     def validate(self, data):
         if not data['title']:
             raise serializers.ValidationError(_("title required"))
-        if not data['reserve_date']:
+        if not self.context['reserve_date']:
             raise serializers.ValidationError(_("reservation date required"))
         if not data['start_time']:
             raise serializers.ValidationError(_("start_time required"))
@@ -43,7 +42,7 @@ class ReservationCreateSerializer(serializers.Serializer):
             raise serializers.ValidationError(_("end_time required"))
         
         self.validate_time(
-            data['reserve_date'],
+            self.context['reserve_date'],
             data['start_time'],
             data['end_time'],
             data['floor']
@@ -56,12 +55,14 @@ class ReservationCreateSerializer(serializers.Serializer):
         reservation = Reservation(
             title=validated_data['title'],
             description=validated_data['description'],
-            reserve_date=validated_data['reserve_date'],
+            reserve_date=self.context['reserve_date'],
             floor=validated_data['floor'],
             start_time=validated_data['start_time'],
             end_time=validated_data['end_time'],
             booker=user,
         )
+        
+        reservation.save()
         
         return reservation
         

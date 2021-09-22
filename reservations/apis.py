@@ -18,7 +18,7 @@ from reservations.serializers import ReservationCreateSerializer
 
 
 # ApiAuthMixin으로 교체 필요
-class ReserveApi(PublicApiMixin, APIView):
+class ReserveApi(ApiAuthMixin, APIView):
     def get(self, request, *args, **kwargs):
         date = kwargs['date']
         
@@ -48,10 +48,12 @@ class ReserveApi(PublicApiMixin, APIView):
         
     @transaction.atomic
     def post(self, request, *args, **kwargs):
-        request.data['reserve_date'] = kwargs['date']
         serializer = ReservationCreateSerializer(
             data=request.data,
-            context={'request': self.request}
+            context={
+                'request': self.request,
+                'reserve_date': kwargs['date'],
+            }
         )
         if not serializer.is_valid(raise_exception=True):
             return Response({
