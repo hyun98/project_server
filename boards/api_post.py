@@ -95,9 +95,8 @@ class PostManageApi(ApiAuthMixin, APIView):
         """
         pk = kwargs['post_id']
         post = get_object_or_404(Post, pk=pk)
-        serializer = PostDetailSerializer(post)
         
-        response = Response(serializer.data, status=status.HTTP_200_OK)
+        response = Response(status=status.HTTP_200_OK)
         
         expire_time = 600
         cookie_value = request.COOKIES.get('hitboard', '_')
@@ -111,6 +110,8 @@ class PostManageApi(ApiAuthMixin, APIView):
             post.hits += 1
             post.save()
         
+        serializer = PostDetailSerializer(post)
+        response.data = serializer.data
         return response
     
     def post(self, request, *args, **kwargs):
