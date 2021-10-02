@@ -24,6 +24,7 @@ class ReservationCreateSerializer(serializers.Serializer):
         
         reservations = Reservation.objects.filter(reserve_date=reserve_date, floor=floor)
         
+        # ***transaction 걸어주기***
         for rev in reservations:
             if end_time <= rev.start_time and rev.end_time <= start_time:
                 continue
