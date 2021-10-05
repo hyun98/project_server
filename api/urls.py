@@ -2,22 +2,22 @@ from django.urls import path, include
 
 
 v1_patterns = [
-    path('auth/', include(('auth.urls', 'auth'))),
-    path('users/', include(('users.urls', 'users'))),
-    path('board/', include(('boards.urls', 'boards'))),
-    path('activity/', include(('activity.urls', 'activity'))),
-    path('FAQs/', include(('FAQs.urls', 'FAQs'))),
-    path('reservations/', include(('reservations.urls', 'reservations'))),
+    path('auth/', include('auth.urls')),
+    path('users/', include('users.urls')),
+    path('board/', include('boards.urls')),
+    path('activity/', include('activity.urls')),
+    path('FAQs/', include('FAQs.urls')),
+    path('reservations/', include('reservations.urls')),
     
 ]
 
 sotonggori = [
-    path('', include(('sotongapp.urls', 'sotongapp'))),
+    path('', include('sotongapp.urls')),
 ]
 
 urlpatterns = [
-    path('v1/', include((v1_patterns, 'v1'))),
-    path('sotong/', include(sotonggori, 'sotong')),
+    path('v1/', include(v1_patterns)),
+    path('sotong/', include(sotonggori)),
     
     path('', include('swagger.urls')),
     path('summernote/', include('django_summernote.urls')),
