@@ -62,6 +62,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     
+    # debug toolbar
+    'debug_toolbar',
+    
     'rest_framework',
     
     'django_extensions',
@@ -78,6 +81,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
+    # debug toolbar
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -100,6 +106,12 @@ CORS_ORIGIN_WHITELIST = env.list(
     'DJANGO_CORS_ORIGIN_WHITELIST',
     default=[BASE_FRONTEND_URL]
 )
+
+
+INTERNAL_IPS = [
+    '127.0.0.1',
+]
+
 
 TEMPLATES = [
     {
