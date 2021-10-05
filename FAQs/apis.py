@@ -9,6 +9,10 @@ from FAQs.models import Answer, Question
 
 class FAQslistAPI(PublicApiMixin, APIView):
     def get(self, request, *args, **kwargs):
+        """
+        FAQ 리스트 반환
+        question : answer
+        """
         QA_list = Question.objects.all()
         
         data_list = []

@@ -8,25 +8,27 @@ from activity.models import Activity, ActivityDetail, ActivityDetailImage
 
 
 
-class ActivityDetailImageInline(admin.StackedInline):
+class ActivityDetailImageInline(SummernoteModelAdminMixin, admin.StackedInline):
     model = ActivityDetailImage
+    summernote_fields = ('description', )
     can_delete = False
     verbose_name_plural = "activity_detail_images"
     
-class ActivityDetailInline(admin.StackedInline):
+class ActivityDetailInline(SummernoteModelAdminMixin, admin.StackedInline):
     model = ActivityDetail
+    summernote_fields = ('description', )
     can_delete = False
     verbose_name_plural = "activity_detail"
 
-class ActivityInline(admin.StackedInline):
+class ActivityInline(SummernoteModelAdminMixin, admin.StackedInline):
     model = Activity
+    summernote_fields = ('description', )
     can_delete = False
     verbose_name_plural = "activity"
 
 
-
 @admin.register(Activity)
-class ActivityAdmin(admin.ModelAdmin):
+class ActivityAdmin(SummernoteModelAdminMixin, admin.ModelAdmin):
     ordering = ('-date', )
     list_display = (
         'get_thumbnail_image', 'title', 'description', 'date',
@@ -36,6 +38,8 @@ class ActivityAdmin(admin.ModelAdmin):
     )
     search_fields = ('date', 'title', )
     list_filter = ('title', )
+    
+    summernote_fields = ('description', )
     
     inlines = (ActivityDetailInline, )
     
@@ -75,16 +79,18 @@ class ActivityDetailAdmin(SummernoteModelAdminMixin, admin.ModelAdmin):
     
 
 @admin.register(ActivityDetailImage)
-class ActivityDetailImageAdmin(admin.ModelAdmin):
+class ActivityDetailImageAdmin(SummernoteModelAdminMixin, admin.ModelAdmin):
     ordering = ('activity_detail__title', )
     list_display = (
-        'get_thumbnail_image', 'order', 'activity_detail',
+        'get_thumbnail_image', 'description', 'order', 'activity_detail',
     )
     list_display_links = (
-        'get_thumbnail_image', 'order', 'activity_detail',
+        'get_thumbnail_image', 'description', 'order', 'activity_detail',
     )
     search_fields = ('date', 'activity_detail__title', )
     list_filter = ('activity_detail__title', )
+    
+    summernote_fields = ('description', )
 
     def get_thumbnail_image(self, obj):
         image = obj.image
@@ -93,3 +99,4 @@ class ActivityDetailImageAdmin(admin.ModelAdmin):
             return ''
         return mark_safe(f'<img src="{image.url}" style="width: 150px;">')
     get_thumbnail_image.short_description = _('Images')
+    

@@ -61,7 +61,6 @@ class ActivityDetailApi(PublicApiMixin, APIView):
                 'id': detail.id,
                 'title': detail.title,
                 'image': detail.image.url,
-                
             }
             
             data_list.append(temp)
@@ -82,13 +81,16 @@ class ActivityDetailImageApi(PublicApiMixin, APIView):
         activity_detail_image_list = ActivityDetailImage.objects.filter(
             activity_detail__id=detail_id
         )
-        image_list = []
+        data_list = []
         for image in activity_detail_image_list:
-            image_list.append(image.image.url)
+            temp = {
+                "images": image.image.url,
+                "description": image.description,
+            }
+            data_list.append(temp)
         
         data = {
-            "images": image_list,
-            "description": activity_detail.description,
+            "data": data_list,
         }
         
         return Response(data, status=status.HTTP_200_OK)

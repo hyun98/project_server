@@ -43,6 +43,7 @@ class ActivityDetail(models.Model):
 
 class ActivityDetailImage(models.Model):
     image = models.ImageField(upload_to='activity_detail', null=True, blank=True)
+    description = models.TextField()
     datetime = models.DateTimeField(auto_now_add=True)
     order = models.PositiveIntegerField(default=0, null=True)
     activity_detail = models.ForeignKey(ActivityDetail, on_delete=models.CASCADE)

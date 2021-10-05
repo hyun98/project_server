@@ -24,7 +24,6 @@ class ReservationCreateSerializer(serializers.Serializer):
         
         reservations = Reservation.objects.filter(reserve_date=reserve_date, floor=floor)
         
-        # ***transaction 걸어주기***
         for rev in reservations:
             if end_time <= rev.start_time and rev.end_time <= start_time:
                 continue
@@ -41,6 +40,8 @@ class ReservationCreateSerializer(serializers.Serializer):
             raise serializers.ValidationError(_("start_time required"))
         if not data['end_time']:
             raise serializers.ValidationError(_("end_time required"))
+        if not data['description']:
+            data['description'] = ''
         
         self.validate_time(
             self.context['reserve_date'],

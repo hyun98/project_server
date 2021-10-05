@@ -17,7 +17,7 @@ def get_file_path(instance, filename):
 
 class Reservation(models.Model):
     title = models.CharField(max_length=128, null=True, blank=False)
-    description = models.TextField(default='', blank=True)
+    description = models.TextField(default='', null=True, blank=True)
     floor = models.IntegerField(default=1, blank=False)
     
     start_time = models.TimeField(null=True, blank=False)

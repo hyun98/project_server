@@ -20,6 +20,9 @@ from reservations.serializers import ReservationCreateSerializer
 # ApiAuthMixin으로 교체 필요
 class ReserveApi(ApiAuthMixin, APIView):
     def get(self, request, *args, **kwargs):
+        """
+        선택한 date에 예약되어있는 예약 리스트 반환
+        """
         date = kwargs['date']
         
         reserve_list = Reservation.objects.filter(reserve_date=date)
@@ -48,6 +51,10 @@ class ReserveApi(ApiAuthMixin, APIView):
         
     @transaction.atomic
     def post(self, request, *args, **kwargs):
+        """
+        예약하기 기능
+        title, start_time, end_time, floor, 로그인 필수
+        """
         serializer = ReservationCreateSerializer(
             data=request.data,
             context={

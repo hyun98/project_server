@@ -54,7 +54,7 @@ class PostListSerializer(serializers.ModelSerializer):
     
     def get_favorite_count(self, obj):
         try:
-            favorites = obj.favorite.all()
+            favorites = obj.favorite_user.all()
             return favorites.count()
         except:
             return 0
@@ -78,7 +78,7 @@ class ReplySerializer(serializers.ModelSerializer):
             return obj.creator.profile.nickname
     
     def get_favorite_count(self, obj):
-        return obj.favorite.all().count()
+        return obj.favorite_user.all().count()
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -101,7 +101,7 @@ class CommentSerializer(serializers.ModelSerializer):
             return obj.creator.profile.nickname
     
     def get_favorite_count(self, obj):
-        return obj.favorite.all().count()
+        return obj.favorite_user.all().count()
 
 
 class FileSerializer(serializers.ModelSerializer):
@@ -110,6 +110,7 @@ class FileSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'filename',
         )
+    
 
 
 class PostDetailSerializer(serializers.ModelSerializer):
