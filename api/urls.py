@@ -11,9 +11,13 @@ v1_patterns = [
     
 ]
 
+sotonggori = [
+    path('', include(('sotongapp.urls', 'sotongapp'))),
+]
 
 urlpatterns = [
     path('v1/', include((v1_patterns, 'v1'))),
+    path('sotong/', include(sotonggori, 'sotong')),
     
     path('', include('swagger.urls')),
     path('summernote/', include('django_summernote.urls')),

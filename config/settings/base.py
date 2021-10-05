@@ -38,14 +38,21 @@ BASE_FRONTEND_URL = env.str('DJANGO_BASE_FRONTEND_URL', default='http://localhos
 # Application definition
 
 INSTALLED_APPS = [
+    # 홈페이지 앱
     'activity',
     'users',
     'boards',
     'FAQs',
     'reservations',
     
-    'swagger',
+    # 소통고리 앱
+    'sotongapp',
     
+    # api 명세
+    'swagger',
+    'drf_yasg',
+    
+    # 마크다운 에디터
     'django_summernote',
 
     'django.contrib.admin',
@@ -56,11 +63,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     
     'rest_framework',
-    'drf_yasg',
+    
     'django_extensions',
     
     'corsheaders',
-    
 ]
 
 MIDDLEWARE = [
