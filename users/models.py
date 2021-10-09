@@ -98,6 +98,7 @@ class User(AbstractUser):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     auth = models.CharField(max_length=128, null=True, blank=True)
+    realname = models.CharField(max_length=64, null=True, blank=True)
     nickname = models.CharField(max_length=64, unique=True, null=True, blank=True)
     image = models.ImageField(
         default='profile_image/basic_profile.png',
@@ -106,6 +107,7 @@ class Profile(models.Model):
     )
     introduce = models.TextField(null=True, blank=True)
     
+    is_project = models.BooleanField(default=False)
     signup_path = models.CharField(max_length=64, default='basic')
     
     favorite_category = models.ManyToManyField(Category, blank=True, related_name='favorite_user')

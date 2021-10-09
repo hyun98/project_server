@@ -18,9 +18,11 @@ class ProfileSerializer(serializers.ModelSerializer):
         model = Profile
         fields = [
             'nickname',
+            'realname',
             'user',
             'image',
             'introduce',
+            'is_project',
             'signup_path',
             'favorite_category',
             'favorite_post',
