@@ -1,7 +1,8 @@
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.core import validators
-from django.db import models
+from django.db import models, transaction
+
 from django.utils.translation import gettext_lazy as _
 from django.utils.deconstruct import deconstructible
 
@@ -19,6 +20,7 @@ class UnicodeUsernameValidator(validators.RegexValidator):
 
 
 class UserManager(BaseUserManager):
+    @transaction.atomic
     def create_user(self, username, email, password=None, **extra_fields):
         print("Create User by manager")
         if not username:

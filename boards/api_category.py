@@ -1,14 +1,21 @@
+from django.db.models.aggregates import Count
+from django.db.models.query import Prefetch
+from django.db.models import Q, F
+from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
+
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from django.shortcuts import get_object_or_404
 
 from api.mixins import ApiAuthMixin, SuperUserMixin
 
 from boards.serializers import CategorySerializer, PostListSerializer
 from boards.models import Category, Post
 
+
+User = get_user_model()
 
 class CategoryCreateReadApi(SuperUserMixin, APIView):
     def get(self, request, *args, **kwargs):
@@ -29,7 +36,9 @@ class CategoryCreateReadApi(SuperUserMixin, APIView):
             "message": "Title required"
             }, status=status.HTTP_400_BAD_REQUEST)
         
-        if Category.objects.filter(title=title).first():
+        
+        # count > 0 조건보다 exists를 사용하는게 쿼리를 적게 호출한다.
+        if not Category.objects.filter(title=title).exists():
             return Response({
             "message": "Title duplicated"
             }, status=status.HTTP_400_BAD_REQUEST)
@@ -61,11 +70,44 @@ class CategoryManageApi(ApiAuthMixin, APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
             
         category = get_object_or_404(Category, pk=pk)
-        postlist = Post.objects.filter(category=category)
         
-        serializer = PostListSerializer(postlist, many=True)
+        postlist = Post.objects.select_related(
+            'creator'
+        ).annotate(
+            nickname=F('creator__profile__nickname'),
+            favorite_count=Count('favorite_user'),
+        ).filter(
+            Q(category__pk=pk)
+        )
         
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        data = []
+        data.append(
+            {
+                'category': category.title,
+                'only_superuser': category.only_superuser,
+            }
+        )
+        
+        for post in postlist:
+            try:
+                imageurl = post.thumbnail.url
+            except:
+                imageurl = ''
+            
+            context = {
+                'id': post.id,
+                'title': post.title,
+                'content': post.content,
+                'thumbnail': imageurl,
+                'hits': post.hits,
+                'favorite_count': post.favorite_count,
+                'created_date': post.created_date,
+                'modified_date': post.modified_date,
+                'creator': post.nickname,
+            }
+            data.append(context)
+        
+        return Response(data, status=status.HTTP_200_OK)
     
     
     def post(self, request, *args, **kwargs):

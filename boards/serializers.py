@@ -1,4 +1,4 @@
-from django.db.models import fields
+from django.db.models import Subquery, CharField, OuterRef
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
@@ -54,8 +54,7 @@ class PostListSerializer(serializers.ModelSerializer):
     
     def get_favorite_count(self, obj):
         try:
-            favorites = obj.favorite_user.all()
-            return favorites.count()
+            return obj.favorite_user.count()
         except:
             return 0
 
