@@ -23,7 +23,8 @@ from django.conf import settings
 urlpatterns = [
     path('projectadminpage/', admin.site.urls),
     path('api/', include('api.urls')),
-    
+    path('swagger/', include('swagger.urls')),
+    path('summernote/', include('django_summernote.urls')),
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
