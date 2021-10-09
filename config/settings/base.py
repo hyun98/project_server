@@ -31,10 +31,6 @@ SECRET_KEY = env('SECRET_KEY')
 REFRESH_TOKEN_SECRET = env('REFRESH_TOKEN_SECRET')
 
 
-BASE_BACKEND_URL = env.str('DJANGO_BASE_BACKEND_URL', default='http://localhost:8000')
-BASE_FRONTEND_URL = env.str('DJANGO_BASE_FRONTEND_URL', default='http://localhost:3000')
-
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -99,15 +95,7 @@ REST_FRAMEWORK = {
 }
 
 
-# CORS SETTINGS
-CORS_ORIGIN_ALLOW_ALL = True
-CORS_ALLOW_CREDENTIALS = True
-CORS_ORIGIN_WHITELIST = env.list(
-    'DJANGO_CORS_ORIGIN_WHITELIST',
-    default=[BASE_FRONTEND_URL]
-)
-
-
+# django_debug_tool
 INTERNAL_IPS = [
     '127.0.0.1',
 ]
