@@ -71,7 +71,7 @@ class GetVisitorView(APIView):
         organ = get_object_or_404(Organ, urlname=urlname)
         totaluser = Information.objects.filter(organ=organ).count()
         todayuser = Information.objects.filter(
-            Q(day=datetime.today()) &\
+            Q(day=datetime.today()) &
             Q(organ=organ)
         ).count()
         avguser, maxuser = get_maxvnum_avgnum(totaluser, organ)

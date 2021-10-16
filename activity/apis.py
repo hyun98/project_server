@@ -75,6 +75,11 @@ class ActivityDetailApi(PublicApiMixin, APIView):
         
 class ActivityDetailImageApi(PublicApiMixin, APIView):
     def get(self, request, *args, **kwargs):
+        """
+        활동 세부 사항 이미지를 모두 불러옴
+        "images": 이미지 url,
+        "description": 이미지 설명,
+        """
         detail_id = kwargs['detail_id']
         activity_detail = get_object_or_404(ActivityDetail, id=detail_id)
         
@@ -98,6 +103,9 @@ class ActivityDetailImageApi(PublicApiMixin, APIView):
 
 class ActivityFilesApi(PublicApiMixin, APIView):
     def get(self, request, *args, **kwargs):
+        """
+        활동 파일을 새 창에 pdf로 열기
+        """
         detail_id = kwargs['detail_id']
         activity_detail = get_object_or_404(ActivityDetail, id=detail_id)
         file_path = os.path.join(settings.MEDIA_ROOT, str(activity_detail.activity_file))

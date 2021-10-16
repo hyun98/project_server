@@ -37,7 +37,7 @@ class LoginApi(PublicApiMixin, APIView):
         if user is None:
             return Response({
                 "message": "user not found"
-            }, status=status.HTTP_400_BAD_REQUEST)
+            }, status=status.HTTP_404_NOT_FOUND)
         if not user.check_password(password):
             return Response({
                 "message": "wrong password"
@@ -89,7 +89,9 @@ class RefreshJWTtoken(PublicApiMixin, APIView):
 @method_decorator(csrf_protect, name='dispatch')
 class LogoutApi(PublicApiMixin, APIView):
     def post(self, request):
-        
+        """
+        클라이언트 refreshtoken 쿠키를 삭제함으로 로그아웃처리
+        """
         response = Response({
             "message": "Logout success"
             }, status=status.HTTP_202_ACCEPTED)
@@ -101,36 +103,50 @@ class LogoutApi(PublicApiMixin, APIView):
 @method_decorator(csrf_protect, name='dispatch')
 class username_duplicate_checkApi(PublicApiMixin, APIView):
     def post(self, request, *args, **kwargs):
+        """
+        회원가입 과정에서 username 중복확인 api
+        'username'값 전송 필요
+        """
         input_username = request.data.get('username', '')
         
         if not input_username:
-            raise ValidationError("Need username")
+            return Response({
+                "message": "Need username"
+            }, status=status.HTTP_400_BAD_REQUEST)
         
-        user = User.objects.filter(username=input_username).first()
+        user = User.objects.filter(username=input_username)
         
-        if user:
-            raise ValidationError("There is an ID registered with that username")
+        if user.exists():
+            return Response({
+                "message": "There is an ID registered with that username"
+            }, status=status.HTTP_400_BAD_REQUEST)
         
         return Response({
             "message": "Allowed username"
-        }
-        ,status=status.HTTP_200_OK)
+        },status=status.HTTP_200_OK)
 
 
 @method_decorator(csrf_protect, name='dispatch')
 class email_duplicate_checkApi(PublicApiMixin, APIView):
     def post(self, request, *args, **kwargs):
+        """
+        회원가입 과정에서 email 중복확인 api
+        'email' 값 전송 필요
+        """
         input_email = request.data.get('email', '')
         
         if not input_email:
-            raise ValidationError("Need email")
+            return Response({
+                "message":"Need email"
+            }, status=status.HTTP_400_BAD_REQUEST)
         
-        user = User.objects.filter(email=input_email).first()
+        user = User.objects.filter(email=input_email)
         
-        if user:
-            raise ValidationError("There is an ID registered with that email")
+        if user.exists():
+            return Response({
+                "message": "There is an ID registered with that email"
+            }, status=status.HTTP_400_BAD_REQUEST)
         
         return Response({
             "message": "Allowed email"
-        }
-        ,status=status.HTTP_200_OK)
+        },status=status.HTTP_200_OK)

@@ -1,4 +1,5 @@
 import json
+from django.core.exceptions import ValidationError
 
 from rest_framework.test import APITestCase, APIClient
 
@@ -6,25 +7,65 @@ from users.models import User, Profile
 
 
 class AuthTest(APITestCase):
+    client = APIClient()
+    headers = {}
     
     def setUp(self):
-        user = User.objects.create_user('test', 'test@test.com', 'test')
+        user = User.objects.create_user(username='test', email='test@test.com', password='test')
         self.user = user
-        profile = Profile(user=user)
-        profile.save()
         
         
     def test_login_api(self):
-        client = APIClient()
         user = {
             'username': 'test',
             'password': 'test'
         }
 
-        response = client.post('/api/v1/auth/login/', json.dumps(user), content_type='application/json')
+        response = self.client.post('/api/v1/auth/login/', json.dumps(user), content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+    
+    def test_username_duplicate_api(self):
+        context = {
+            'username': 'test',
+        }
+        response = self.client.post('/api/v1/auth/validate/username/', json.dumps(context), content_type='application/json')
+        self.assertEqual(response.status_code, 400)
         
-        print(response)
-        
+        context = {
+            'username': 'test1',
+        }
+        response = self.client.post('/api/v1/auth/validate/username/', json.dumps(context), content_type='application/json')
         self.assertEqual(response.status_code, 200)
         
+    def test_email_duplicate_api(self):
+        context = {
+            'email': 'test@test.com',
+        }
+        response = self.client.post('/api/v1/auth/validate/email/', json.dumps(context), content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+        
+        context = {
+            'email': 'test1@test.com',
+        }
+        response = self.client.post('/api/v1/auth/validate/email/', json.dumps(context), content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+    
+    def test_login_api(self):
+        context = {
+            "username": "test",
+            "password": "test"
+        }
+        
+        response = self.client.post('/api/v1/auth/login/', json.dumps(context), content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        
+        self.token = response.data['access_token']
+        self.csrftoken = response.cookies.get('csrftoken').value
+        
+        self.assertNotEqual(self.token, '')
+        self.assertNotEqual(self.csrftoken, '')
+        
+        print("jwt_token : ", self.token)
+        print("csrf_token : ", self.csrftoken)
+    
     

@@ -78,7 +78,7 @@ class User(AbstractUser):
         blank=True
     )
     
-    object = UserManager()
+    objects = UserManager()
     
     class Meta:
         swappable = 'AUTH_USER_MODEL'
