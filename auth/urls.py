@@ -1,9 +1,9 @@
 from django.urls import path, include
 
 from auth.apis import LoginApi, LogoutApi, username_duplicate_checkApi, email_duplicate_checkApi, RefreshJWTtoken
-from auth.googleapi import *
-from auth.kakaoapi import *
-from auth.naverapi import *
+from auth.googleapi import GoogleLoginApi, GoogleSigninCallBackApi
+from auth.kakaoapi import KakaoLoginApi, KakaoSigninCallBackApi
+from auth.naverapi import NaverLoginApi, NaverSigninCallBackApi
 
 
 login_patterns = [

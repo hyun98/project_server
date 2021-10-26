@@ -26,11 +26,18 @@ User = get_user_model()
 
 class UserMeApi(ApiAuthMixin, APIView):
     def get(self, request, *args, **kwargs):
+        """
+        현재 로그인 된 유저의 모든 정보 반환
+        username, email, last_login, profile etc...
+        """
         if request.user is None:
             raise exceptions.PermissionDenied('PermissionDenied')
         return Response(UserSerializer(request.user, context={'request':request}).data)
     
     def put(self, request, *args, **kwargs):
+        """
+        현재 로그인 된 유저의 비밀번호 변경
+        """
         user = request.user
         if not check_password(request.data.get("oldpassword"), user.password):
             raise serializers.ValidationError(

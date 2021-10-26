@@ -20,6 +20,11 @@ class CSRFCheck(CsrfViewMiddleware):
 
 
 class SafeJWTAuthentication(BaseAuthentication):
+    """
+    JWT Authentication
+    헤더의 jwt 값을 디코딩해 얻은 user_id 값을 통해서 유저 인증 여부를 판단한다.
+    """
+    
     def authenticate(self, request):
         authorization_header = request.headers.get('Authorization')
         
@@ -40,7 +45,10 @@ class SafeJWTAuthentication(BaseAuthentication):
         except IndexError:
             raise exceptions.AuthenticationFailed('Token prefix missing')
         
-        user = User.objects.filter(id=payload['user_id']).first()
+        return self.authenticate_credentials(payload['user_id'])
+    
+    def authenticate_credentials(self, key):
+        user = User.objects.filter(id=key).first()
         
         if user is None:
             raise exceptions.AuthenticationFailed('User not found')
@@ -50,7 +58,6 @@ class SafeJWTAuthentication(BaseAuthentication):
         
         # self.enforce_csrf(request)
         return (user, None)
-
 
     def enforce_csrf(self, request):
         check = CSRFCheck()
@@ -82,17 +89,22 @@ class AdministratorAuthentication(BaseAuthentication):
         except IndexError:
             raise exceptions.AuthenticationFailed('Token prefix missing')
         
-        user = User.objects.filter(id=payload['user_id']).first()
+        return self.authenticate_credentials(payload['user_id'])
+    
+    def authenticate_credentials(self, key):
+        user = User.objects.filter(id=key).first()
         
         if user is None:
             raise exceptions.AuthenticationFailed('User not found')
         
+        if not user.is_active:
+            raise exceptions.AuthenticationFailed('User is inactive')
+        
         if not user.is_superuser:
             raise exceptions.AuthenticationFailed('User is not superuser')
         
-        self.enforce_csrf(request)
+        # self.enforce_csrf(request)
         return (user, None)
-
 
     def enforce_csrf(self, request):
         check = CSRFCheck()
