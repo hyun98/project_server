@@ -1,23 +1,24 @@
-from django.core import exceptions
 from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from django.db import transaction
+from django.db.models import Q
 from django.conf import settings
+from django.core import exceptions
+from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import check_password
 from django.core.management.utils import get_random_secret_key
-from django.core.exceptions import ValidationError
-from django.utils.translation import gettext_lazy as _
 from django.template.loader import render_to_string
-from django.contrib.auth import get_user_model
+from django.utils.translation import gettext_lazy as _
 
 from api.mixins import ApiAuthMixin, PublicApiMixin
 
 from auth.authenticate import jwt_login
 
-from users.serializers import RegisterSerializer, UserSerializer, PasswordChangeSerializer
 from users.models import Profile
+from users.serializers import RegisterSerializer, UserSerializer,\
+    PasswordChangeSerializer, validate_password12
 from users.services import send_mail, email_auth_string
 
 
@@ -32,7 +33,19 @@ class UserMeApi(ApiAuthMixin, APIView):
         """
         if request.user is None:
             raise exceptions.PermissionDenied('PermissionDenied')
-        return Response(UserSerializer(request.user, context={'request':request}).data)
+        
+        user_query = User.objects\
+            .filter(Q(username="admin"))\
+            .prefetch_related(
+                'profile__favorite_post',
+                'profile__favorite_post__favorite_user',
+                'profile__favorite_post__creator',
+                'profile__favorite_post__category',
+                'profile__favorite_category',
+                'profile__favorite_category__favorite_user',
+            )
+        
+        return Response(UserSerializer(user_query, many=True, context={'request':request}).data)
     
     def put(self, request, *args, **kwargs):
         """
@@ -59,6 +72,11 @@ class UserMeApi(ApiAuthMixin, APIView):
     
     
     def delete(self, request, *args, **kwargs):
+        """
+        현재 로그인 된 유저 삭제
+        소셜 로그인 유저는 바로 삭제.
+        일반 회원가입 유저는 비밀번호 입력 후 삭제.
+        """
         user = request.user
         signup_path = user.profile.signup_path
         
@@ -83,6 +101,11 @@ class UserMeApi(ApiAuthMixin, APIView):
 class UserCreateApi(PublicApiMixin, APIView):
     @transaction.atomic
     def post(self, request, *args, **kwargs):
+        """
+        회원가입 api
+        user 모델과 profile 모델이 반드시 같이 생성되어야 하기 때문에
+        transaction 적용
+        """
         serializer = RegisterSerializer(data=request.data)
         if not serializer.is_valid(raise_exception=True):
             return Response({
@@ -101,11 +124,21 @@ class UserCreateApi(PublicApiMixin, APIView):
 
 class FindIDApi(PublicApiMixin, APIView):
     def post(self, request, *args, **kwargs):
+        """
+        유저 아이디 찾기
+        email 입력을 통해 아이디를 찾을 수 있다.
+        email 필드가 unique인 이유.
+        """
         target_email = request.data.get('email', '')
-        user = User.objects.get(email=target_email)
+        user = User.objects.filter(email=target_email)
+        
+        if not user.exists():
+            return Response({
+                "message": "user not found"
+            }, status=status.HTTP_404_NOT_FOUND)
         
         data = {
-            "username": user.username
+            "username": user.first().username
         }
         
         return Response(data, status=status.HTTP_200_OK)
@@ -119,15 +152,15 @@ class SendPasswordEmailApi(PublicApiMixin, APIView):
         target_username = request.data.get('username', '')
         target_email = request.data.get('email', '')
         
-        target_user = User.objects.get(
+        target_user = User.objects.filter(
             username=target_username, 
             email=target_email
         )
         
-        if target_user:
+        if target_user.exists():
             auth_string = email_auth_string()
-            target_user.profile.auth = auth_string
-            target_user.profile.save()
+            target_user.first().profile.auth = auth_string
+            target_user.first().profile.save()
             
             try:
                 send_mail(
@@ -140,7 +173,7 @@ class SendPasswordEmailApi(PublicApiMixin, APIView):
             except:
                 return Response({
                     "message": "email error",
-                }, status=status.HTTP_400_BAD_REQUEST)
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                 
             return Response({
                 "message": "Verification code sent"
@@ -149,7 +182,7 @@ class SendPasswordEmailApi(PublicApiMixin, APIView):
         else:
             return Response({
                 "message": "User does not exist"
-            }, status=status.HTTP_400_BAD_REQUEST)
+            }, status=status.HTTP_404_NOT_FOUND)
             
 
 class ConfirmPasswordEmailApi(PublicApiMixin, APIView):
@@ -157,7 +190,6 @@ class ConfirmPasswordEmailApi(PublicApiMixin, APIView):
         """
         1. 인증 코드 확인
         2. 해당 username으로 로그인
-        3. 
         """
         target_username = request.data.get('username', '')
         target_code = request.data.get('code', '')
@@ -182,14 +214,17 @@ class ConfirmPasswordEmailApi(PublicApiMixin, APIView):
 
 class ResetPasswordApi(ApiAuthMixin, APIView):
     def post(self, request, *args, **kwargs):
+        """
+        비밀번호 찾기 이메일 인증 이후
+        비밀번호 변경 api
+        """
         password1 = request.data.get('password1', '')
         password2 = request.data.get('password2', '')
         user = request.user
         
-        if password1 != password2 or not password1 or not password2:
-            raise ValidationError(_("password error"))
+        newpassword = validate_password12(password1, password2)
         
-        user.set_password(password1)
+        user.set_password(newpassword)
         user.save()
         
         response = Response({

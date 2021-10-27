@@ -46,7 +46,6 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = [
             'nickname',
             'realname',
-            'user',
             'image',
             'introduce',
             'is_project',
@@ -54,13 +53,6 @@ class ProfileSerializer(serializers.ModelSerializer):
             'favorite_category',
             'favorite_post',
         ]
-    
-    def get_favorite_post(self, obj):
-        return obj.favorite_post.all()
-    
-    def get_favorite_category(self, obj):
-        return obj.favorite_category.all()
-    
         
 
 class UserSerializer(serializers.ModelSerializer):

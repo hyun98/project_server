@@ -6,18 +6,19 @@ from boards.models import Category, Post, Comment, PostFile, Reply
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    # favorite_count = serializers.SerializerMethodField(read_only=True)
-    creator = serializers.CharField(source="creator.profile.nickname", read_only=True)
+    favorite_count = serializers.SerializerMethodField(read_only=True)
     
     class Meta:
         model = Category
         fields = (
-            'id', 'title', 'created_date', 'top_fixed', 
-             'creator',
+            'id', 'title', 'created_date', 'top_fixed',
         )
     
-    # def get_favorite_count(self, obj):
-    #     return obj.favorite.all().count()
+    def get_favorite_count(self, obj):
+        try:
+            return obj.favorite_user.count()
+        except:
+            return 0
 
 
 class PostListSerializer(serializers.ModelSerializer):
