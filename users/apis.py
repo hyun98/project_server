@@ -164,7 +164,7 @@ class SendPasswordEmailApi(PublicApiMixin, APIView):
             
             try:
                 send_mail(
-                    '[PROJECT:HOME] 비밀번호 찾기 인증 메일입니다.',
+                    'PROJECT 비밀번호 찾기 인증 메일입니다.',
                     recipient_list=[target_email],
                     html=render_to_string('recovery_email.html', {
                         'auth_string': auth_string,

@@ -6,11 +6,10 @@ from rest_framework.response import Response
 
 from django.contrib.auth import get_user_model
 from django.conf import settings
-from django.core.exceptions import ValidationError
 from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
 
 from auth.authenticate import generate_access_token, jwt_login
-from api.mixins import PublicApiMixin, ApiAuthMixin
+from api.mixins import PublicApiMixin
 from django.utils.decorators import method_decorator
 
 
