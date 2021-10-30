@@ -27,7 +27,7 @@ CORS_ALLOW_CREDENTIALS = True
 # )
 
 # 실제 배포시 바꿀 예정
-ALLOWED_HOSTS = ['3.35.243.239']
+ALLOWED_HOSTS = ['*']
 
 DATABASES = {
     'default': {
