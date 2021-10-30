@@ -64,7 +64,7 @@ def GetOrganName(request, urlname):
     return JsonResponse(data)
 
 
-class GetVisitorView(APIView):
+class GetVisitorView(PublicApiMixin, APIView):
     def get(self, request, urlname):
         """
         선택한 기관의 전체 사용자 수, 오늘 사용자 수,
