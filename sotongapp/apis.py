@@ -49,6 +49,8 @@ def AllUserCount(request):
 class InfoViewSet(viewsets.ModelViewSet):
     queryset = Information.objects.order_by('-day', '-time')
     serializer_class = InfoSerializer
+    permission_classes = ()
+    authentication_classes = ()
 
     def get_queryset(self):
         return super().get_queryset().filter(organ__urlname=self.request.GET['search'])
