@@ -11,7 +11,7 @@ def read_secret(secret_name):
     return secret
 
 
-DEBUG = False
+DEBUG = True
 
 
 BASE_BACKEND_URL = env.str('DJANGO_BASE_BACKEND_URL')
@@ -19,7 +19,7 @@ BASE_FRONTEND_URL = env.str('DJANGO_BASE_FRONTEND_URL')
 
 
 # CORS SETTINGS
-CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 # CORS_ORIGIN_WHITELIST = env.list(
 #     'DJANGO_CORS_ORIGIN_WHITELIST',
