@@ -11,7 +11,7 @@ def read_secret(secret_name):
     return secret
 
 
-DEBUG = True
+DEBUG = False
 
 
 BASE_BACKEND_URL = env.str('DJANGO_BASE_BACKEND_URL')
