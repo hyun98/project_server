@@ -34,8 +34,10 @@ class UserMeApi(ApiAuthMixin, APIView):
         if request.user is None:
             raise exceptions.PermissionDenied('PermissionDenied')
         
+        username = request.user.username
+        
         user_query = User.objects\
-            .filter(Q(username="admin"))\
+            .filter(Q(username=username))\
             .prefetch_related(
                 'profile__favorite_post',
                 'profile__favorite_post__favorite_user',

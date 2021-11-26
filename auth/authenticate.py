@@ -45,9 +45,9 @@ class SafeJWTAuthentication(BaseAuthentication):
         except IndexError:
             raise exceptions.AuthenticationFailed('Token prefix missing')
         
-        return self.authenticate_credentials(payload['user_id'])
+        return self.authenticate_credentials(request, payload['user_id'])
     
-    def authenticate_credentials(self, key):
+    def authenticate_credentials(self, request, key):
         user = User.objects.filter(id=key).first()
         
         if user is None:
@@ -89,9 +89,9 @@ class AdministratorAuthentication(BaseAuthentication):
         except IndexError:
             raise exceptions.AuthenticationFailed('Token prefix missing')
         
-        return self.authenticate_credentials(payload['user_id'])
+        return self.authenticate_credentials(request, payload['user_id'])
     
-    def authenticate_credentials(self, key):
+    def authenticate_credentials(self, request, key):
         user = User.objects.filter(id=key).first()
         
         if user is None:

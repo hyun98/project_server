@@ -109,7 +109,19 @@ class PostManageApi(ApiAuthMixin, APIView):
             post.hits += 1
             post.save()
         
-        serializer = PostDetailSerializer(post)
+        queryset = Post.objects.\
+            select_related(
+                'creator',
+                'creator__profile'
+            ).\
+            prefetch_related(
+                'comment',
+                'comment__creator',
+                'comment__reply'
+            ).\
+            filter(pk=pk).first()
+        
+        serializer = PostDetailSerializer(queryset, many=False)
         response.data = serializer.data
         return response
     
