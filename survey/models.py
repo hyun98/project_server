@@ -52,7 +52,8 @@ class Applier(models.Model):
     birth = models.CharField(max_length=32, null=True, blank=True)
     phone = models.CharField(max_length=32, null=True, blank=True)
     is_applied = models.BooleanField(default=False)
-    apply_date = models.DateTimeField(auto_now_add=True, auto_now=True)
+    
+    apply_date = models.DateTimeField(auto_now=True)
     
     GENDER_CHOICE = (
         ("M", "남자"),
