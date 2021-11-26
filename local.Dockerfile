@@ -2,17 +2,12 @@ FROM python:3.9.0
 
 WORKDIR /home/
 
-COPY ./ /home/project_server/
+COPY ./ /home/ubuntu/project_server/
 
-WORKDIR /home/project_server/
+WORKDIR /home/ubuntu/project_server/
 
 RUN apt-get upgrade && pip3 install --upgrade pip
 
 RUN pip install -r requirements.txt
 
 EXPOSE 8000
-
-CMD ["bash", "-c", \
-     "python manage.py makemigrations --settings=config.settings.local && \
-      python manage.py migrate --settings=config.settings.local && \
-      python manage.py runserver 0.0.0.0:8000 --settings=config.settings.local"]

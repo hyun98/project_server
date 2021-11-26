@@ -8,6 +8,7 @@ v1_patterns = [
     path('activity/', include('activity.urls')),
     path('FAQs/', include('FAQs.urls')),
     path('reservations/', include('reservations.urls')),
+    path('survey/', include('survey.urls')),
     
 ]
 

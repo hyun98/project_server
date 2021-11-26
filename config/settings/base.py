@@ -27,8 +27,8 @@ environ.Env.read_env(
 )
 
 
-SECRET_KEY = env('SECRET_KEY')
-REFRESH_TOKEN_SECRET = env('REFRESH_TOKEN_SECRET')
+SECRET_KEY = env.str('SECRET_KEY')
+REFRESH_TOKEN_SECRET = env.str('REFRESH_TOKEN_SECRET')
 
 
 # Application definition
@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'boards',
     'FAQs',
     'reservations',
+    'survey',
     
     # 소통고리 앱
     'sotongapp',
@@ -94,11 +95,6 @@ REST_FRAMEWORK = {
     ),
 }
 
-
-# django_debug_tool
-INTERNAL_IPS = [
-    '127.0.0.1',
-]
 
 
 TEMPLATES = [
