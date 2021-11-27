@@ -10,11 +10,10 @@ class BoardTest(APITestCase):
     client = APIClient()
     headers = {}
     
+    # @classmethod
     def setUp(self):
-        user = User.objects.create_user('test', 'test@test.com', 'test1234@')
+        user = User.objects.create_superuser('test', 'test@test.com', 'test1234@')
         self.user = user
-        profile = Profile(user=user)
-        profile.save()
         
         category = Category(title="카테고리", creator=self.user)
         category.save()
@@ -59,13 +58,12 @@ class BoardTest(APITestCase):
     ## ==== POST create TEST ALL ====
     def test_create_category(self):
         context = {
-            'title': "<script> window.location.href = 'https://hyeo-noo.tistory.com/'; </script>"
+            'title': "test 카테고리"
         }
         
         response = self.client.post(
             '/api/v1/board/', 
             json.dumps(context), **self.headers, content_type='application/json')
-        # print(Category.objects.filter(id=2).first().title)
         self.assertEqual(response.status_code, 201)
     
     
@@ -196,7 +194,6 @@ class BoardTest(APITestCase):
             f'/api/v1/board/{self.category.id}/post/{self.post.id}', 
             **self.headers, content_type='application/json')
         self.assertEqual(response.status_code, 204)
-        
         self.post.delete()
     
     
@@ -208,13 +205,10 @@ class BoardTest(APITestCase):
         
         
     def test_delete_category(self):
-        self.post.delete()
-        
         response = self.client.delete(
             f'/api/v1/board/{self.category.id}', 
             **self.headers, content_type='application/json')
         self.assertEqual(response.status_code, 204)
         
         self.category.delete()
-    
-    
+     

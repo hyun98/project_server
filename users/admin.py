@@ -11,7 +11,8 @@ class ProfileInline(admin.StackedInline):
     model = Profile
     can_delete = False
     verbose_name_plural = "profile"
-    
+
+admin.site.register(Profile)
 
 @admin.register(User)
 class UserAdmin(DjangoUserAdmin):

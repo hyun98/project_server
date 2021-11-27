@@ -52,8 +52,10 @@ class Applier(models.Model):
     birth = models.CharField(max_length=32, null=True, blank=True)
     phone = models.CharField(max_length=32, null=True, blank=True)
     is_applied = models.BooleanField(default=False)
+    is_picked = models.BooleanField(default=False)
+    is_favor = models.BooleanField(default=False)
     
-    apply_date = models.DateTimeField(auto_now=True)
+    apply_date = models.DateTimeField(auto_now_add=True)
     
     GENDER_CHOICE = (
         ("M", "남자"),
@@ -77,7 +79,9 @@ class Answer(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name="answer")
     applier = models.ForeignKey(Applier, on_delete=models.CASCADE, related_name="answer")
     survey = models.ForeignKey(Survey, on_delete=models.CASCADE, related_name="answer")
-
+    
+    def __str__(self):
+        return self.answer
 
 
 def get_file_path(instance, filename):
@@ -86,8 +90,8 @@ def get_file_path(instance, filename):
     return '/'.join(['upload_file_apply/', ymd_path, uuid_name])
 
 
-class SurveyFile(models.Model):
-    upload_files = models.FileField(upload_to=get_file_path, null=True, blank=True, verbose_name='파일')
+class ApplyFile(models.Model):
+    apply_file = models.FileField(upload_to=get_file_path, null=True, blank=True, verbose_name='파일')
     filename = models.CharField(max_length=128, null=True, verbose_name='첨부파일명')
     
     applier = models.ForeignKey(Applier, on_delete=models.CASCADE, related_name="applyfile")

@@ -1,41 +1,37 @@
+from os import stat
 from rest_framework import viewsets
-from rest_framework.views import Response, status
+from rest_framework.views import Response, status, APIView
 
 from django.db import transaction
 
-from api.mixins import PublicApiMixin
+from api.mixins import ApiAuthMixin, PublicApiMixin
 from survey.serializers import *
 from survey.models import *
+from users.models import User
 
 
-class SurveyApi(PublicApiMixin, viewsets.ModelViewSet):
-    queryset = Survey.objects.select_related(
-            'creator'
-        ).\
-        prefetch_related(
-            'question',
-            'question__sub_question'
-        ).\
-        all()
-    
-    serializer_class = SurveySerializer
-    
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
-    
-    def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
-    
-    def destroy(self, request, *args, **kwargs):
-        if not request.user.is_superuser:
-            return Response(status=status.HTTP_403_FORBIDDEN)
+class SurveyListApi(ApiAuthMixin, APIView):
+    def get(self, request, *args, **kwargs):
+        """
+        현재 만들어진 지원/설문지 리스트 출력
+        """
+        queryset = Survey.objects.select_related(
+                'creator'
+            ).\
+            prefetch_related(
+                'question',
+                'question__sub_question'
+            ).\
+            all()
         
-        return super().destroy(request, *args, **kwargs)
+        serializer = SurveySerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
     @transaction.atomic
-    def create(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
+        """
+        지원서 생성
+        """
         if not request.user:
             return Response(status=status.HTTP_403_FORBIDDEN)
         
@@ -43,6 +39,7 @@ class SurveyApi(PublicApiMixin, viewsets.ModelViewSet):
         description = request.data.get('description', '')[0]
         start_date = request.data.get('start_date', '')[0]
         due_date = request.data.get('due_date', '')[0]
+        
         creator = request.user
         
         question_list = request.data.get('question', '')
@@ -83,72 +80,57 @@ class SurveyApi(PublicApiMixin, viewsets.ModelViewSet):
                 ).save()
             
         return Response(status=status.HTTP_201_CREATED)
-    
-    def update(self, request, *args, **kwargs):
-        return super().update(request, *args, **kwargs)
-    
-    
-class ApplyApi(PublicApiMixin, viewsets.ModelViewSet):
-    
-    def retrieve(self, request, *args, **kwargs):
+        
+
+class SurveyDetailApi(PublicApiMixin, APIView):
+    def get(self, request, *args, **kwargs):
         """
-        지원서 하나 확인
+        id에 맞는 survey 선택
+        """
+        survey_id = kwargs["survey_id"]
+        object = Survey.objects.get(pk=survey_id)
+        serializer = SurveySerializer(object)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def delete(self, request, *args, **kwargs):
+        """
+        id에 맞는 survey 삭제
+        """
+        survey_id = kwargs["survey_id"]
+        
+        if not request.user.is_superuser:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        
+        survey = Survey.objects.get(pk=survey_id)
+        survey.delete()
+        
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ApplierListApi(PublicApiMixin, APIView):
+    def get(self, request, *args, **kwargs):
+        """
+        지원자 전체 리스트로 확인
         ** 지원서를 만든 계정만 지원서를 볼 수 있음 **
-        0. 지원서 종류 확인 -> 지원서 id 받아야함
-        1. 지원자 이름, 생년월일, 휴대폰 번호를 가지고 지원자 id 추려냄
-        2. 해당 지원서에서 지원자의 응답을 추려서 반환
-        
+        지원자 이름 | 지원자 생년월일 | 지원자 성별 | 지원자 휴대폰 번호 | 지원 시간 | 관심 | 뽑혔는지
+        위 정보 반환
         """
-        survey_id = request.data.get('survey_id')[0]
-        applier_phone = request.data.get('phone')[0]
-        applier_name = request.data.get('name')[0]
-        applier_birth = request.data.get('birth')[0]
-        
+        survey_id = kwargs['survey_id']
         survey = Survey.objects.get(pk=survey_id)
         
         if not survey.has_permission(request.user):
             return Response(status=status.HTTP_403_FORBIDDEN)
         
-        applier = Applier.objects.filter(
-            name=applier_name,
-            phone=applier_phone,
-            birth=applier_birth
+        applier_query = Applier.objects.filter(
+            survey=survey,
+            is_applied=True
         )
+        serializer = ApplierListSerializer(applier_query, many=True)
         
-        if not applier.exists():
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        applier = applier.first()
-        
-        answer_list = Answer.objects.select_related(
-                'question'
-            ).\
-            filter(
-                survey=survey,
-                applier=applier
-            )
-        
-        
-        
-        instance = self.get_object()
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
-        
-    
-    def list(self, request, *args, **kwargs):
-        """
-        지원서 전체 리스트로 확인
-        ** 지원서를 만든 계정만 지원서를 볼 수 있음 **
-        지원 종류 | 지원자 이름 | 지원자 생년월일 | 지원자 학교 | 지원자 번호
-        위 정보 반환
-        """
-        
-        
-        
-        return super().list(request, *args, **kwargs)
-    
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
     @transaction.atomic
-    def create(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         """
         지원하기
         # 지원서 제출 시 server 동작
@@ -163,16 +145,19 @@ class ApplyApi(PublicApiMixin, viewsets.ModelViewSet):
         applier_name = request.data.get('name')[0]
         applier_birth = request.data.get('birth')[0]
         applier_gender = request.data.get('gender')[0]
+        is_applied = request.data.get('is_applied')[0]
         
         # 지원서 정보
         survey_id = request.data.get('survey_id')[0]
+        survey = Survey.objects.get(pk=survey_id)
         
         applier = Applier(
             name=applier_name,
             birth=applier_birth,
             phone=applier_phone,
             gender=applier_gender,
-            survey=survey_id
+            is_applied=is_applied,
+            survey=survey
         )
         applier.save()
         
@@ -181,12 +166,99 @@ class ApplyApi(PublicApiMixin, viewsets.ModelViewSet):
         
         for answer in answer_list:
             q_id = answer["question_id"][0]
+            question = Question.objects.get(pk=q_id)
             ans = ", ".join(answer["answer"])
             Answer(
                 answer=ans,
-                question=q_id,
-                applier=applier
+                question=question,
+                applier=applier,
+                survey=survey
             ).save()
         
+        # 파일 저장
+        files = request.FILES.getlist('applyfiles')
+        
+        for file in files:
+            applyfile = ApplyFile(
+                apply_file=file,
+                filename=file.name,
+                applier=applier
+            )
+            applyfile.save()
+        
         return Response(status=status.HTTP_201_CREATED)
+
+
+class ApplierDetailApi(PublicApiMixin, APIView):
+    def get(self, request, *args, **kwargs):
+        """
+        ** 지원서를 만든 계정만 지원서를 볼 수 있음 **
+        관리자가 지원서 하나 확인
+        0. 지원서 종류 확인 -> 지원서 id 받아야함
+        1. 지원자 id url로 받음
+        2. 해당 지원서에서 지원자의 응답을 추려서 반환
+        """
+        applier_id = kwargs["applier_id"]
+        survey_id = kwargs["survey_id"]
+        
+        survey = Survey.objects.get(pk=survey_id)
+        
+        if not survey.has_permission(request.user):
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        
+        applier_query = Applier.objects.prefetch_related(
+            'question',
+            'answer'
+            'applyfile'
+        ).\
+        filter(
+            pk=applier_id,
+            survey=survey
+        )
+        
+        applier_data = ApplierSerializer(applier_query).data
+
+        return Response(applier_data, status=status.HTTP_200_OK)
+    
+    def post(self, request, *args, **kwargs):
+        """
+        해당 지원자 합/불
+        """
+        applier_id = kwargs["applier_id"]
+        survey_id = kwargs["survey_id"]
+        survey = Survey.objects.get(id=survey_id)
+        applier = Applier.objects.get(
+            pk=applier_id,
+            survey=survey
+        )
+        
+        if applier.is_picked:
+            applier.is_picked = False
+        else:
+            applier.is_picked = True
+        applier.save()
+        
+        return Response(status=status.HTTP_202_ACCEPTED)
+    
+
+class ApplierFavorApi(PublicApiMixin, APIView):
+    def post(self, request, *args, **kwargs):
+        """
+        해당 지원자 관심 선택/해제
+        """
+        applier_id = kwargs["applier_id"]
+        survey_id = kwargs["survey_id"]
+        survey = Survey.objects.get(id=survey_id)
+        applier = Applier.objects.get(
+            pk=applier_id,
+            survey=survey
+        )
+        
+        if applier.is_picked:
+            applier.is_favor = False
+        else:
+            applier.is_favor = True
+        applier.save()
+        
+        return Response(status=status.HTTP_202_ACCEPTED)
     

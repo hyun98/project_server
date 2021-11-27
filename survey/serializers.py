@@ -18,9 +18,9 @@ class QuestionSerializer(serializers.ModelSerializer):
             'can_duplicate', 'survey', 'sub_question'
             
 
-class SurveyFileSerializer(serializers.ModelSerializer):
+class ApplyFileSerializer(serializers.ModelSerializer):
     class Meta:
-        model = SurveyFile
+        model = ApplyFile
         fields = '__all__'
 
 
@@ -33,7 +33,27 @@ class SurveySerializer(serializers.ModelSerializer):
     
 
 class AnswerSerializer(serializers.ModelSerializer):
+    question = serializers.SerializerMethodField()
     
     class Meta:
         model = Answer
+        fields = ['id', 'question', 'answer']
+    
+    def get_question(self, obj):
+        return obj.question.content
+
+
+class ApplierSerializer(serializers.ModelSerializer):
+    answer = AnswerSerializer(many=True)
+    applyfiles = ApplyFileSerializer(many=True)
+    
+    class Meta:
+        model = Applier
         fields = '__all__'
+
+
+class ApplierListSerializer(serializers.ModelSerializer):    
+    class Meta:
+        model = Applier
+        fields = ['id', 'name', 'birth', 'gender',\
+            'phone', 'apply_date', 'is_favor', 'is_picked']

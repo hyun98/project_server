@@ -56,7 +56,7 @@ class SafeJWTAuthentication(BaseAuthentication):
         if not user.is_active:
             raise exceptions.AuthenticationFailed('User is inactive')
         
-        # self.enforce_csrf(request)
+        self.enforce_csrf(request)
         return (user, None)
 
     def enforce_csrf(self, request):
@@ -68,29 +68,10 @@ class SafeJWTAuthentication(BaseAuthentication):
             raise exceptions.PermissionDenied(f'CSRF Failed: {reason}')
 
 
-class AdministratorAuthentication(BaseAuthentication):
+class AdministratorAuthentication(SafeJWTAuthentication):
     def authenticate(self, request):
-        authorization_header = request.headers.get('Authorization')
+        return super().authenticate(request)
         
-        if not authorization_header:
-            return None
-            
-        try:
-            prefix = authorization_header.split(' ')[0]
-            if prefix.lower() != 'jwt':
-                raise exceptions.AuthenticationFailed('Token is not jwt')
-
-            access_token = authorization_header.split(' ')[1]
-            payload = jwt.decode(
-                access_token, settings.SECRET_KEY, algorithms=['HS256']
-            )
-        except jwt.ExpiredSignatureError:
-            raise exceptions.AuthenticationFailed('access_token expired')
-        except IndexError:
-            raise exceptions.AuthenticationFailed('Token prefix missing')
-        
-        return self.authenticate_credentials(request, payload['user_id'])
-    
     def authenticate_credentials(self, request, key):
         user = User.objects.filter(id=key).first()
         
@@ -103,16 +84,12 @@ class AdministratorAuthentication(BaseAuthentication):
         if not user.is_superuser:
             raise exceptions.AuthenticationFailed('User is not superuser')
         
-        # self.enforce_csrf(request)
+        self.enforce_csrf(request)
+        
         return (user, None)
 
     def enforce_csrf(self, request):
-        check = CSRFCheck()
-        
-        check.process_request(request)
-        reason = check.process_view(request, None, (), {})
-        if reason:
-            raise exceptions.PermissionDenied(f'CSRF Failed: {reason}')
+        super().enforce_csrf(request)
 
 
 class EmailorUsernameAuthBackend(backends.ModelBackend):

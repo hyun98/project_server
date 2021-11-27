@@ -6,4 +6,6 @@ from survey.models import *
 admin.site.register(Survey) 
 admin.site.register(Question)
 admin.site.register(SubQuestion)
-admin.site.register(SurveyFile)
+admin.site.register(ApplyFile)
+admin.site.register(Applier)
+admin.site.register(Answer)

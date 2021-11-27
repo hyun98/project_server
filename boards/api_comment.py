@@ -76,7 +76,7 @@ class CommentManageApi(ApiAuthMixin, APIView):
             }, status=status.HTTP_403_FORBIDDEN)
     
         comment.delete()
-        
+                
         return Response({
             "message": "Comment delete success"
         }, status=status.HTTP_204_NO_CONTENT)

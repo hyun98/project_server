@@ -11,7 +11,7 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = (
-            'id', 'title', 'created_date', 'top_fixed',
+            'id', 'title', 'created_date', 'top_fixed', 'favorite_count'
         )
     
     def get_favorite_count(self, obj):

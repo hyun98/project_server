@@ -22,7 +22,6 @@ class UnicodeUsernameValidator(validators.RegexValidator):
 class UserManager(BaseUserManager):
     @transaction.atomic
     def create_user(self, username, email, password=None, **extra_fields):
-        print("Create User by manager")
         if not username:
             raise ValueError('아이디는 필수 항목입니다.')
         if not email:

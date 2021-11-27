@@ -76,7 +76,7 @@ class ReplyManageApi(ApiAuthMixin, APIView):
             }, status=status.HTTP_403_FORBIDDEN)
     
         reply.delete()
-        
+
         return Response({
             "message": "Reply delete success"
         }, status=status.HTTP_204_NO_CONTENT)

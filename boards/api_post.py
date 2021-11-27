@@ -206,7 +206,7 @@ class PostManageApi(ApiAuthMixin, APIView):
                 filename=file.name,
                 post=post
             )
-        postfile.save()
+            postfile.save()
         
         return Response({
             "message": "Post update success"

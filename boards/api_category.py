@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 
-from api.mixins import ApiAuthMixin, SuperUserMixin
+from api.mixins import ApiAuthMixin, PublicApiMixin, SuperUserMixin
 
 from boards.serializers import CategorySerializer, PostListSerializer
 from boards.models import Category, Post
@@ -29,6 +29,9 @@ class CategoryCreateReadApi(SuperUserMixin, APIView):
         """
         카테고리를 새로 만든다. title 필수
         """
+        # if not request.user.is_superuser:
+        #     return Response(status=status.HTTP_403_FORBIDDEN)
+        
         title = request.data.get('title', '')
         
         if title == '':
@@ -38,7 +41,7 @@ class CategoryCreateReadApi(SuperUserMixin, APIView):
         
         
         # count > 0 조건보다 exists를 사용하는게 쿼리를 적게 호출한다.
-        if not Category.objects.filter(title=title).exists():
+        if Category.objects.filter(title=title).exists():
             return Response({
             "message": "Title duplicated"
             }, status=status.HTTP_400_BAD_REQUEST)
@@ -141,12 +144,13 @@ class CategoryManageApi(ApiAuthMixin, APIView):
         """
         pk = kwargs['cate_id']
         category = get_object_or_404(Category, pk=pk)
-        
+        print(category.creator, request.user)
         if request.user != category.creator:
             return Response({
                 "message": "You do not have permission"
             }, status=status.HTTP_403_FORBIDDEN)
         
+        print(category.post.all().count())
         if category.post.all().count() > 0:
             return Response({
                 "message": "Post exists"
