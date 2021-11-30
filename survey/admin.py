@@ -21,7 +21,7 @@ class SubQuestionInline(admin.StackedInline):
     
     
 @admin.register(Survey)
-class UserAdmin(admin.ModelAdmin):
+class SurveyAdmin(admin.ModelAdmin):
     ordering = ('-created_date', )
     list_display = (
         'title', 'description', 'start_date', 'due_date',

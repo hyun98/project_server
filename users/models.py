@@ -37,10 +37,12 @@ class UserManager(BaseUserManager):
         user.set_password(password)
         user.full_clean()
         user.save()
-        
+        print("make user by manager")
+        print(user)
         profile = Profile(user=user, nickname=username)
         profile.save()
         
+        print(profile)
         return user
     
     def create_superuser(self, username, email=None, password=None):

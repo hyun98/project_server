@@ -113,11 +113,8 @@ class UserCreateApi(PublicApiMixin, APIView):
             return Response({
                 "message": "Request Body Error"
                 }, status=status.HTTP_409_CONFLICT)
-
+            
         user = serializer.save()
-        
-        profile = Profile(user=user, nickname=user.username, introduce="소개를 작성해주세요.")
-        profile.save()
         
         response = Response(status=status.HTTP_200_OK)
         response = jwt_login(response=response, user=user)
