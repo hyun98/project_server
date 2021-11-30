@@ -1,13 +1,12 @@
-from os import stat
-from rest_framework import viewsets
 from rest_framework.views import Response, status, APIView
 
 from django.db import transaction
+from django.http.response import HttpResponse
 
 from api.mixins import ApiAuthMixin, PublicApiMixin
 from survey.serializers import *
 from survey.models import *
-from users.models import User
+from survey.services import makeApplierDF
 
 
 class SurveyListApi(ApiAuthMixin, APIView):
@@ -187,6 +186,39 @@ class ApplierListApi(PublicApiMixin, APIView):
             applyfile.save()
         
         return Response(status=status.HTTP_201_CREATED)
+
+
+class ApplierCSVApi(PublicApiMixin, APIView):
+    def get(self, request, *args, **kwargs):
+        survey_id = kwargs["survey_id"]
+        survey = Survey.objects.get(pk=survey_id)
+        
+        question_list = Question.objects.filter(
+            survey=survey
+        ).\
+        order_by('order')
+        applierDf = makeApplierDF(question_list)
+        applier_list = Applier.objects.prefetch_related(
+            'answer',
+            'answer__question'
+        ).\
+        all()
+        
+        print(applierDf)
+        
+        for applier in applier_list:
+            answer_list = Answer.objects.filter(
+                survey=survey,
+                applier=applier
+            )
+            for answer in answer_list:
+                print(applierDf[answer.question.content])
+                applierDf[answer.question.content].append(answer.answer)
+        
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = "attachment; filename=" + survey.title + "지원자응답리스트.csv"
+        applierDf.to_csv(path_or_buf=response)
+        return response
 
 
 class ApplierDetailApi(PublicApiMixin, APIView):

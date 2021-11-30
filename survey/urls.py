@@ -8,6 +8,8 @@ applier_urlpatterns = [
     path('applierfavor/<int:applier_id>', ApplierFavorApi.as_view()),
     path('applier/<int:applier_id>', ApplierDetailApi.as_view()),
     path('applier', ApplierListApi.as_view()),
+    path('appliercsv', ApplierCSVApi.as_view()),
+    
 ]
 
 urlpatterns = [
