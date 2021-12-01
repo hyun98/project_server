@@ -1,8 +1,13 @@
 import urllib
+import os
+import mimetypes
+
 from rest_framework.views import Response, status, APIView
+from rest_framework.exceptions import NotFound
 
 from django.db import transaction
 from django.http.response import HttpResponse
+from django.shortcuts import get_object_or_404
 
 from api.mixins import ApiAuthMixin, PublicApiMixin
 from survey.serializers import *
@@ -10,7 +15,7 @@ from survey.models import *
 from survey.services import createApplierDF, addApplierDF
 
 
-class SurveyListApi(ApiAuthMixin, APIView):
+class SurveyApi(ApiAuthMixin, APIView):
     def get(self, request, *args, **kwargs):
         """
         현재 만들어진 지원/설문지 리스트 출력
@@ -107,7 +112,7 @@ class SurveyDetailApi(PublicApiMixin, APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class ApplierListApi(PublicApiMixin, APIView):
+class ApplyApi(PublicApiMixin, APIView):
     def get(self, request, *args, **kwargs):
         """
         지원자 전체 리스트로 확인
@@ -241,9 +246,7 @@ class ApplierDetailApi(PublicApiMixin, APIView):
             pk=applier_id,
             survey=survey
         )
-        
         applier_data = ApplierSerializer(applier_query).data
-
         return Response(applier_data, status=status.HTTP_200_OK)
     
     def post(self, request, *args, **kwargs):
@@ -265,7 +268,28 @@ class ApplierDetailApi(PublicApiMixin, APIView):
         applier.save()
         
         return Response(status=status.HTTP_202_ACCEPTED)
-    
+
+
+class ApplierFileDownloadApi(PublicApiMixin, APIView):
+    def get(self, request, *args, **kwargs):
+        """
+        
+        """
+        file = get_object_or_404(ApplyFile, pk=kwargs['file_id'])
+        url = file.apply_file.url[1:]
+        file_url = urllib.parse.unquote(url)
+            
+        if os.path.exists(file_url):
+            with open(file_url, 'rb') as f:
+                quote_file_url = urllib.parse.quote(file.filename.encode('utf-8'))
+                response = HttpResponse(
+                    f.read(), content_type=mimetypes.guess_type(file_url)[0]
+                )
+                response['Content-Disposition'] = 'attachment;filename*=UTF-8\'\'%s' % quote_file_url
+                return response
+        else:
+            raise NotFound
+
 
 class ApplierFavorApi(PublicApiMixin, APIView):
     def post(self, request, *args, **kwargs):
