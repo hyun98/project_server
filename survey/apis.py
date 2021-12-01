@@ -1,3 +1,4 @@
+import urllib
 from rest_framework.views import Response, status, APIView
 
 from django.db import transaction
@@ -190,6 +191,10 @@ class ApplierListApi(PublicApiMixin, APIView):
 
 class ApplierCSVApi(PublicApiMixin, APIView):
     def get(self, request, *args, **kwargs):
+        """
+        survey/{설문지번호}/appliercsv
+        해당 설문지 응답 리스트 csv파일로 다운로드
+        """
         survey_id = kwargs["survey_id"]
         survey = Survey.objects.get(pk=survey_id)
         
@@ -202,21 +207,30 @@ class ApplierCSVApi(PublicApiMixin, APIView):
             'answer',
             'answer__question'
         ).\
-        all()
-        
-        print(applierDf)
+        all().order_by('apply_date')
         
         for applier in applier_list:
+            newdata = {}
+            newdata["지원일자"]=applier.apply_date.strftime('%Y-%m-%d %H:%M:%S')
+            newdata["이름"]=applier.name
+            newdata["성별"]=applier.gender
+            newdata["생년월일"]=applier.birth
+            newdata["전화번호"]=applier.phone
+            
             answer_list = Answer.objects.filter(
                 survey=survey,
                 applier=applier
             )
             for answer in answer_list:
-                print(applierDf[answer.question.content])
-                applierDf[answer.question.content].append(answer.answer)
+                newdata[answer.question.content]=answer.answer           
+                
+            newdata["선발여부"]=applier.is_picked
+            applierDf = applierDf.append(newdata, ignore_index=True)
         
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = "attachment; filename=" + survey.title + "지원자응답리스트.csv"
+        response = HttpResponse(content_type='text/csv', charset="utf-8")
+        filename = "{}.csv".format("".join(survey.title.split()))
+        filename = urllib.parse.quote(filename.encode('utf-8'))
+        response['Content-Disposition'] = "attachment; filename*=utf-8''{}".format(filename)
         applierDf.to_csv(path_or_buf=response)
         return response
 
