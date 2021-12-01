@@ -7,7 +7,7 @@ from django.http.response import HttpResponse
 from api.mixins import ApiAuthMixin, PublicApiMixin
 from survey.serializers import *
 from survey.models import *
-from survey.services import makeApplierDF
+from survey.services import createApplierDF, addApplierDF
 
 
 class SurveyListApi(ApiAuthMixin, APIView):
@@ -202,30 +202,10 @@ class ApplierCSVApi(PublicApiMixin, APIView):
             survey=survey
         ).\
         order_by('order')
-        applierDf = makeApplierDF(question_list)
-        applier_list = Applier.objects.prefetch_related(
-            'answer',
-            'answer__question'
-        ).\
-        all().order_by('apply_date')
+        applierDf = createApplierDF(question_list)
         
-        for applier in applier_list:
-            newdata = {}
-            newdata["지원일자"]=applier.apply_date.strftime('%Y-%m-%d %H:%M:%S')
-            newdata["이름"]=applier.name
-            newdata["성별"]=applier.gender
-            newdata["생년월일"]=applier.birth
-            newdata["전화번호"]=applier.phone
-            
-            answer_list = Answer.objects.filter(
-                survey=survey,
-                applier=applier
-            )
-            for answer in answer_list:
-                newdata[answer.question.content]=answer.answer           
-                
-            newdata["선발여부"]=applier.is_picked
-            applierDf = applierDf.append(newdata, ignore_index=True)
+        applier_query = Applier.objects.all().order_by('apply_date')
+        applierDf = addApplierDF(applier_query, applierDf, survey)
         
         response = HttpResponse(content_type='text/csv', charset="utf-8")
         filename = "{}.csv".format("".join(survey.title.split()))
