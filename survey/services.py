@@ -4,7 +4,7 @@ from survey.models import Answer
 
 
 def createApplierDF(question_list):
-    columns = ["지원일자", "이름", "성별", "생년월일", "전화번호"]
+    columns = ["지원일자", "이름", "성별", "생년월일", "전화번호", "학교"]
     for question in question_list:
         columns.append(question.content)
     columns.append("선발여부")
@@ -13,7 +13,7 @@ def createApplierDF(question_list):
     return df
 
 
-def addApplierDF(applier_query, df, survey):
+def addApplierDF(applier_query, df):
     for applier in applier_query:
         newdata = {}
         newdata["지원일자"]=applier.apply_date.strftime('%Y-%m-%d %H:%M:%S')
@@ -21,15 +21,9 @@ def addApplierDF(applier_query, df, survey):
         newdata["성별"]=applier.gender
         newdata["생년월일"]=applier.birth
         newdata["전화번호"]=applier.phone
-        
-        answer_list = Answer.objects.select_related(
-                'question'
-            ).\
-            filter(
-                survey=survey,
-                applier=applier
-            )
-        for answer in answer_list:
+        newdata["학교"]=applier.univ
+
+        for answer in applier.answer.all():
             newdata[answer.question.content]=answer.answer           
             
         newdata["선발여부"]=applier.is_picked

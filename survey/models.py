@@ -29,6 +29,7 @@ class Survey(models.Model):
 
 class Question(models.Model):
     content = models.TextField(default="", null=True, blank=True)
+    description = models.TextField(default="", null=True, blank=True)
     order = models.PositiveIntegerField(null=True, blank=True)
     is_multichoice = models.BooleanField(default=False)
     can_duplicate = models.BooleanField(default=False)
@@ -51,6 +52,7 @@ class Applier(models.Model):
     name = models.CharField(max_length=64, null=True, blank=True)
     birth = models.CharField(max_length=32, null=True, blank=True)
     phone = models.CharField(max_length=32, null=True, blank=True)
+    univ = models.CharField(max_length=32, null=True, blank=True)
     is_applied = models.BooleanField(default=False)
     is_picked = models.BooleanField(default=False)
     is_favor = models.BooleanField(default=False)

@@ -150,6 +150,7 @@ class ApplyApi(PublicApiMixin, APIView):
         applier_name = request.data.get('name')[0]
         applier_birth = request.data.get('birth')[0]
         applier_gender = request.data.get('gender')[0]
+        applier_univ = request.data.get('univ')[0]
         is_applied = request.data.get('is_applied')[0]
         
         # 지원서 정보
@@ -161,6 +162,7 @@ class ApplyApi(PublicApiMixin, APIView):
             birth=applier_birth,
             phone=applier_phone,
             gender=applier_gender,
+            univ=applier_univ,
             is_applied=is_applied,
             survey=survey
         )
@@ -209,8 +211,14 @@ class ApplierCSVApi(PublicApiMixin, APIView):
         order_by('order')
         applierDf = createApplierDF(question_list)
         
-        applier_query = Applier.objects.all().order_by('apply_date')
-        applierDf = addApplierDF(applier_query, applierDf, survey)
+        applier_query = Applier.objects.prefetch_related(
+            'answer',
+            'answer__question'
+        ).\
+        filter(
+            survey=survey
+        ).order_by('apply_date')
+        applierDf = addApplierDF(applier_query, applierDf)
         
         response = HttpResponse(content_type='text/csv', charset="utf-8")
         filename = "{}.csv".format("".join(survey.title.split()))
