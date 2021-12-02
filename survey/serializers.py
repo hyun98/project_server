@@ -14,7 +14,7 @@ class QuestionSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Question
-        fields = 'id', 'content', 'order', 'is_multichoice', \
+        fields = 'id', 'content', 'order', 'is_multichoice', 'required', \
             'can_duplicate', 'survey', 'sub_question'
             
 
@@ -55,5 +55,5 @@ class ApplierSerializer(serializers.ModelSerializer):
 class ApplierListSerializer(serializers.ModelSerializer):    
     class Meta:
         model = Applier
-        fields = ['id', 'name', 'birth', 'gender',\
+        fields = ['id', 'name', 'birth', 'gender', 'univ',\
             'phone', 'apply_date', 'is_favor', 'is_picked']
