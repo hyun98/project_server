@@ -32,6 +32,7 @@ class Question(models.Model):
     description = models.TextField(default="", null=True, blank=True)
     order = models.PositiveIntegerField(null=True, blank=True)
     is_multichoice = models.BooleanField(default=False)
+    required = models.BooleanField(default=False)
     can_duplicate = models.BooleanField(default=False)
     survey = models.ForeignKey(Survey, on_delete=models.CASCADE, related_name="question")
     
