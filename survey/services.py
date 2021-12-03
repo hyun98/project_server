@@ -1,7 +1,5 @@
 import pandas as pd
 
-from survey.models import Answer
-
 
 def createApplierDF(question_list):
     columns = ["지원일자", "이름", "성별", "생년월일", "전화번호", "학교"]
@@ -19,8 +17,8 @@ def addApplierDF(applier_query, df):
         newdata["지원일자"]=applier.apply_date.strftime('%Y-%m-%d %H:%M:%S')
         newdata["이름"]=applier.name
         newdata["성별"]=applier.gender
-        newdata["생년월일"]=applier.birth
-        newdata["전화번호"]=applier.phone
+        newdata["생년월일"]=str(applier.birth)
+        newdata["전화번호"]=str(applier.phone)
         newdata["학교"]=applier.univ
 
         for answer in applier.answer.all():

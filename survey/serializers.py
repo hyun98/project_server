@@ -15,7 +15,7 @@ class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
         fields = 'id', 'content', 'order', 'is_multichoice', 'required', \
-            'can_duplicate', 'survey', 'sub_question'
+            'description', 'can_duplicate', 'survey', 'sub_question'
             
 
 class ApplyFileSerializer(serializers.ModelSerializer):
