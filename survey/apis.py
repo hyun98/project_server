@@ -115,7 +115,7 @@ class SurveyDetailApi(PublicApiMixin, APIView):
 
 
 class ApplyApi(PublicApiMixin, APIView):
-    parser_classes = (FileUploadParser, MultiPartParser, )
+    # parser_classes = (FileUploadParser, MultiPartParser, )
     
     def get(self, request, *args, **kwargs):
         """
@@ -135,7 +135,7 @@ class ApplyApi(PublicApiMixin, APIView):
         condition.add(Q(is_applied=True), Q.AND)
         
         if kw:
-            condition.add(Q(name__icontains=kw) | Q(univ__icontains=kw))
+            condition.add(Q(name__icontains=kw) | Q(univ__icontains=kw), Q.AND)
             
         applier_query = Applier.objects.filter(
             condition
@@ -178,6 +178,7 @@ class ApplyApi(PublicApiMixin, APIView):
             survey=survey
         )
         applier.save()
+        applier_str = applier_name + "_"
         
         # 응답 정보
         answer_list = request.data.get('answers')
@@ -200,7 +201,7 @@ class ApplyApi(PublicApiMixin, APIView):
             print("file", file)
             applyfile = ApplyFile(
                 apply_file=file,
-                filename=file.name,
+                filename=applier_str+file.name,
                 applier=applier
             )
             applyfile.save()
