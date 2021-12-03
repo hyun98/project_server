@@ -261,6 +261,7 @@ class ApplierDetailApi(PublicApiMixin, APIView):
         
         applier_query = Applier.objects.prefetch_related(
             'answer',
+            'answer__question',
             'applyfile'
         ).\
         filter(
@@ -295,7 +296,8 @@ class ApplierDetailApi(PublicApiMixin, APIView):
 class ApplierFileDownloadApi(PublicApiMixin, APIView):
     def get(self, request, *args, **kwargs):
         """
-        
+        현재 설문지의 작성자와 로그인 되어있는 유저가 동일하면 다운로드 가능
+        url로 전달받은 파일
         """
         file = get_object_or_404(ApplyFile, pk=kwargs['file_id'])
         url = file.apply_file.url[1:]
@@ -348,8 +350,8 @@ class ApplierSelfCheckApi(PublicApiMixin, APIView):
         survey = Survey.objects.get(pk=survey_id)
         
         applier = Applier.objects.prefetch_related(
-            'question',
-            'answer'
+            'answer',
+            'answer__question',
             'applyfile'
         ).\
         filter(
@@ -369,8 +371,11 @@ class ApplierSelfCheckApi(PublicApiMixin, APIView):
         return Response(applier_data, status=status.HTTP_200_OK)
 
 
+## FILE UPLOAD SAMPLE CODE
+## SHOULD DESTROY
 class filetest(PublicApiMixin, APIView):
     def post(self, request):
+        print(request.FILES)
         files = request.FILES.get("files")
         print(files)
         
