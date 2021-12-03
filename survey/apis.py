@@ -191,7 +191,7 @@ class ApplyApi(PublicApiMixin, APIView):
             ).save()
         
         # 파일 저장
-        files = request.FILES.get('applyfiles')
+        files = request.data.get('applyfiles')
         
         for file in files:
             applyfile = ApplyFile(
