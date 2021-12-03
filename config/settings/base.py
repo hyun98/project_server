@@ -236,7 +236,7 @@ LOGGING = {
             'class': 'django.utils.log.AdminEmailHandler'
         },
         'file': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'encoding': 'utf-8',
             'filters': ['require_debug_false'],
             'class': 'logging.handlers.TimedRotatingFileHandler',
@@ -257,7 +257,7 @@ LOGGING = {
             'level': 'INFO',
             'propagate': False,
         },
-        'quant': {
+        'project': {
             'handlers': ['console', 'file'],
             'level': 'INFO',
         },
