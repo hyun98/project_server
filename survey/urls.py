@@ -11,6 +11,7 @@ applier_urlpatterns = [
     
     path('appliercsv', ApplierCSVApi.as_view()),
     path('applierfile/<int:file_id>', ApplierFileDownloadApi.as_view()),
+    path('applierselfcheck', ApplierSelfCheckApi.as_view()),
     
 ]
 

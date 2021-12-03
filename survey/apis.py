@@ -6,6 +6,7 @@ from rest_framework.views import Response, status, APIView
 from rest_framework.exceptions import NotFound
 
 from django.db import transaction
+from django.db.models import Q
 from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404
 
@@ -120,15 +121,21 @@ class ApplyApi(PublicApiMixin, APIView):
         지원자 이름 | 지원자 생년월일 | 지원자 성별 | 지원자 휴대폰 번호 | 지원 시간 | 관심 | 뽑혔는지
         위 정보 반환
         """
+        kw = request.GET["kw"]
         survey_id = kwargs['survey_id']
         survey = Survey.objects.get(pk=survey_id)
-        
+    
         if not survey.has_permission(request.user):
             return Response(status=status.HTTP_403_FORBIDDEN)
         
+        condition = Q(survey=survey)
+        condition.add(Q(is_applied=True), Q.AND)
+        
+        if kw:
+            condition.add(Q(name__icontains=kw) | Q(univ__icontains=kw))
+            
         applier_query = Applier.objects.filter(
-            survey=survey,
-            is_applied=True
+            condition
         )
         serializer = ApplierListSerializer(applier_query, many=True)
         
@@ -319,4 +326,38 @@ class ApplierFavorApi(PublicApiMixin, APIView):
         applier.save()
         
         return Response(status=status.HTTP_202_ACCEPTED)
+    
+
+class ApplierSelfCheckApi(PublicApiMixin, APIView):
+    def get(self, request, *args, **kwargs):
+        survey_id = kwargs["survey_id"]
+        applier_name = request.data.get('name', '')[0]
+        applier_phone = request.data.get('phone', '')[0]
+        applier_birth = request.data.get('birth', '')[0]
+        
+        if not applier_name or not applier_phone or not applier_birth:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+    
+        survey = Survey.objects.get(pk=survey_id)
+        
+        applier = Applier.objects.prefetch_related(
+            'question',
+            'answer'
+            'applyfile'
+        ).\
+        filter(
+            name=applier_name,
+            phone=applier_phone,
+            birth=applier_birth,
+            survey=survey
+        )
+        
+        if not applier.exists():
+            return Response({
+            "message": "지원자 정보를 찾을 수 없습니다."
+        },status=status.HTTP_404_NOT_FOUND)
+        
+        applier_data = ApplierSerializer(applier).data
+        applier_data["due_date"] = survey.due_date
+        return Response(applier_data, status=status.HTTP_200_OK)
     
