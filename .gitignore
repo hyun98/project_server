@@ -9,6 +9,7 @@ server.Dockerfile
 project.crt
 project.key
 local.docker-compose.yml
+logs
 
 ### Django ###
 *.log

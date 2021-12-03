@@ -151,6 +151,7 @@ class ApplyApi(PublicApiMixin, APIView):
         3. sub_question이 있는 경우 -> 
             sub_question에서 선택하거나 적은 정보들을 모두 text로 answer에 저장.
         """
+        print("지원 상황!", request.data)
         
         # 지원자 정보
         applier_phone = request.data.get('phone')[0]
@@ -190,7 +191,7 @@ class ApplyApi(PublicApiMixin, APIView):
             ).save()
         
         # 파일 저장
-        files = request.FILES.getlist('applyfiles')
+        files = request.FILES.get('applyfiles')
         
         for file in files:
             applyfile = ApplyFile(
