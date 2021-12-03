@@ -16,7 +16,9 @@ applier_urlpatterns = [
 ]
 
 urlpatterns = [
+    
     path('', SurveyApi.as_view()),
+    path('file', filetest.as_view()),
     path('<int:survey_id>', SurveyDetailApi.as_view()),
     path('<int:survey_id>/', include(applier_urlpatterns)),
 ]

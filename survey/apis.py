@@ -155,6 +155,7 @@ class ApplyApi(PublicApiMixin, APIView):
             sub_question에서 선택하거나 적은 정보들을 모두 text로 answer에 저장.
         """
         print("지원 상황: ", request.data)
+        print("파일 : ", request.FILES)
         
         # 지원자 정보
         applier_phone = request.data.get('phone')[0]
@@ -195,7 +196,7 @@ class ApplyApi(PublicApiMixin, APIView):
             ).save()
         
         # 파일 저장
-        files = request.data.get('applyfiles')
+        files = request.FILES.get('applyfiles')
         
         for file in files:
             print("file", file)
@@ -366,4 +367,11 @@ class ApplierSelfCheckApi(PublicApiMixin, APIView):
         applier_data = ApplierSerializer(applier).data
         applier_data["due_date"] = survey.due_date
         return Response(applier_data, status=status.HTTP_200_OK)
-    
+
+
+class filetest(PublicApiMixin, APIView):
+    def post(self, request):
+        files = request.FILES.get("files")
+        print(files)
+        
+        return Response(status=status.HTTP_200_OK)
