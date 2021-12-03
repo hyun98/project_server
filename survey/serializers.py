@@ -45,7 +45,7 @@ class AnswerSerializer(serializers.ModelSerializer):
 
 class ApplierSerializer(serializers.ModelSerializer):
     answer = AnswerSerializer(many=True)
-    applyfiles = ApplyFileSerializer(many=True)
+    applyfile = ApplyFileSerializer(many=True)
     
     class Meta:
         model = Applier

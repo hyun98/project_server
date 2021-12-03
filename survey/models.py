@@ -88,7 +88,7 @@ class Answer(models.Model):
 
 
 def get_file_path(instance, filename):
-    ymd_path = datetime.now().strftime('%Y/%m/%d')
+    ymd_path = datetime.datetime.now().strftime('%Y/%m/%d')
     uuid_name = uuid4().hex
     return '/'.join(['upload_file_apply/', ymd_path, uuid_name])
 

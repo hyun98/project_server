@@ -121,10 +121,10 @@ class ApplyApi(PublicApiMixin, APIView):
         지원자 이름 | 지원자 생년월일 | 지원자 성별 | 지원자 휴대폰 번호 | 지원 시간 | 관심 | 뽑혔는지
         위 정보 반환
         """
-        kw = request.GET["kw"]
+        kw = request.GET.get("kw", '')
         survey_id = kwargs['survey_id']
         survey = Survey.objects.get(pk=survey_id)
-    
+        
         if not survey.has_permission(request.user):
             return Response(status=status.HTTP_403_FORBIDDEN)
         
@@ -253,15 +253,15 @@ class ApplierDetailApi(PublicApiMixin, APIView):
             return Response(status=status.HTTP_403_FORBIDDEN)
         
         applier_query = Applier.objects.prefetch_related(
-            'question',
-            'answer'
+            'answer',
             'applyfile'
         ).\
         filter(
             pk=applier_id,
             survey=survey
         )
-        applier_data = ApplierSerializer(applier_query).data
+        
+        applier_data = ApplierSerializer(applier_query, many=True).data
         return Response(applier_data, status=status.HTTP_200_OK)
     
     def post(self, request, *args, **kwargs):
