@@ -5,7 +5,7 @@
 ### Deploy ###
 nginx.conf
 docker-compose.yml
-server.Dockerfile
+local.Dockerfile
 project.crt
 project.key
 local.docker-compose.yml
