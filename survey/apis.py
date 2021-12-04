@@ -1,9 +1,12 @@
 import urllib
 import os
+import json
 import mimetypes
 
-from rest_framework.parsers import MultiPartParser, FileUploadParser
-from rest_framework.views import Response, status, APIView
+from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework.response import Response
+
 from rest_framework.exceptions import NotFound
 
 from django.db import transaction
@@ -154,19 +157,21 @@ class ApplyApi(PublicApiMixin, APIView):
         3. sub_question이 있는 경우 -> 
             sub_question에서 선택하거나 적은 정보들을 모두 text로 answer에 저장.
         """
-        print("지원 상황: ", request.data)
+        print("지원 상황: ", request.data.get('data'))
         print("파일 : ", request.FILES)
         
+        data = json.loads(request.data.get('data'))
+        
         # 지원자 정보
-        applier_phone = request.data.get('phone')[0]
-        applier_name = request.data.get('name')[0]
-        applier_birth = request.data.get('birth')[0]
-        applier_gender = request.data.get('gender')[0]
-        applier_univ = request.data.get('univ')[0]
-        is_applied = request.data.get('is_applied')[0]
+        applier_phone = data.get('phone')[0]
+        applier_name = data.get('name')[0]
+        applier_birth = data.get('birth')[0]
+        applier_gender = data.get('gender')[0]
+        applier_univ = data.get('univ')[0]
+        is_applied = data.get('is_applied')[0]
         
         # 지원서 정보
-        survey_id = request.data.get('survey_id')[0]
+        survey_id = data.get('survey_id')[0]
         survey = Survey.objects.get(pk=survey_id)
         
         applier = Applier(
@@ -182,7 +187,7 @@ class ApplyApi(PublicApiMixin, APIView):
         applier_str = applier_name + "_"
         
         # 응답 정보
-        answer_list = request.data.get('answers')
+        answer_list = data.get('answers')
         
         for answer in answer_list:
             q_id = answer["question_id"][0]
@@ -196,10 +201,11 @@ class ApplyApi(PublicApiMixin, APIView):
             ).save()
         
         # 파일 저장
-        files = request.FILES.get('applyfiles')
+        files = request.FILES.getlist('files')
         
         for file in files:
             print("file", file)
+            print("filename : ", file.name)
             applyfile = ApplyFile(
                 apply_file=file,
                 filename=applier_str+file.name,
@@ -256,8 +262,8 @@ class ApplierDetailApi(PublicApiMixin, APIView):
         
         survey = Survey.objects.get(pk=survey_id)
         
-        if not survey.has_permission(request.user):
-            return Response(status=status.HTTP_403_FORBIDDEN)
+        # if not survey.has_permission(request.user):
+        #     return Response(status=status.HTTP_403_FORBIDDEN)
         
         applier_query = Applier.objects.prefetch_related(
             'answer',
@@ -328,7 +334,7 @@ class ApplierFavorApi(PublicApiMixin, APIView):
             survey=survey
         )
         
-        if applier.is_picked:
+        if applier.is_favor:
             applier.is_favor = False
         else:
             applier.is_favor = True
@@ -369,14 +375,3 @@ class ApplierSelfCheckApi(PublicApiMixin, APIView):
         applier_data = ApplierSerializer(applier).data
         applier_data["due_date"] = survey.due_date
         return Response(applier_data, status=status.HTTP_200_OK)
-
-
-## FILE UPLOAD SAMPLE CODE
-## SHOULD DESTROY
-class filetest(PublicApiMixin, APIView):
-    def post(self, request):
-        print(request.FILES)
-        files = request.FILES.get("files")
-        print(files)
-        
-        return Response(status=status.HTTP_200_OK)
