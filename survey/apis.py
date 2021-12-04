@@ -118,8 +118,6 @@ class SurveyDetailApi(PublicApiMixin, APIView):
 
 
 class ApplyApi(PublicApiMixin, APIView):
-    # parser_classes = (FileUploadParser, MultiPartParser, )
-    
     def get(self, request, *args, **kwargs):
         """
         지원자 전체 리스트로 확인

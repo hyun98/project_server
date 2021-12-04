@@ -1,5 +1,4 @@
 from django.db.models.aggregates import Count
-from django.db.models.query import Prefetch
 from django.db.models import Q, F
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
@@ -8,14 +7,14 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from api.mixins import ApiAuthMixin, SuperUserMixin
 
-from api.mixins import ApiAuthMixin, PublicApiMixin, SuperUserMixin
-
-from boards.serializers import CategorySerializer, PostListSerializer
+from boards.serializers import CategorySerializer
 from boards.models import Category, Post
 
 
 User = get_user_model()
+
 
 class CategoryCreateReadApi(SuperUserMixin, APIView):
     def get(self, request, *args, **kwargs):
@@ -29,9 +28,6 @@ class CategoryCreateReadApi(SuperUserMixin, APIView):
         """
         카테고리를 새로 만든다. title 필수
         """
-        # if not request.user.is_superuser:
-        #     return Response(status=status.HTTP_403_FORBIDDEN)
-        
         title = request.data.get('title', '')
         
         if title == '':
@@ -66,13 +62,18 @@ class CategoryManageApi(ApiAuthMixin, APIView):
         cate_id에 맞는 게시판의 글을 모두 보여준다.
         """
         pk = kwargs['cate_id']
-        
-        if not pk:
-            return Response({
-                "message": "Select a board type"
-            }, status=status.HTTP_400_BAD_REQUEST)
-            
+        kw = request.GET.get("kw", '')
+    
         category = get_object_or_404(Category, pk=pk)
+        
+        condition = Q(category__pk=pk)
+        if kw:
+            condition.add(
+                Q(title__icontains=kw) | 
+                Q(content__icontains=kw) |
+                Q(creator__profile__nickname__icontains=kw) 
+                ,Q.AND
+            )
         
         postlist = Post.objects.select_related(
             'creator'
@@ -80,7 +81,7 @@ class CategoryManageApi(ApiAuthMixin, APIView):
             nickname=F('creator__profile__nickname'),
             favorite_count=Count('favorite_user'),
         ).filter(
-            Q(category__pk=pk)
+            condition
         )
         
         data = []
@@ -120,10 +121,6 @@ class CategoryManageApi(ApiAuthMixin, APIView):
         """
         pk = kwargs['cate_id']
         user = request.user
-        if not pk:
-            return Response({
-                "message": "Select a board type"
-            }, status=status.HTTP_400_BAD_REQUEST)
         
         category = get_object_or_404(Category, pk=pk)
         
@@ -144,16 +141,15 @@ class CategoryManageApi(ApiAuthMixin, APIView):
         """
         pk = kwargs['cate_id']
         category = get_object_or_404(Category, pk=pk)
-        print(category.creator, request.user)
+        
         if request.user != category.creator:
             return Response({
                 "message": "You do not have permission"
             }, status=status.HTTP_403_FORBIDDEN)
         
-        print(category.post.all().count())
         if category.post.all().count() > 0:
             return Response({
-                "message": "Post exists"
+                "message": "Post exists. Cannot delete category"
             }, status=status.HTTP_403_FORBIDDEN)
         
         category.delete()
