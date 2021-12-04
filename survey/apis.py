@@ -80,8 +80,8 @@ class SurveyApi(ApiAuthMixin, APIView):
             question.save()
             
             for sq in subquestion_list:
-                sub_content = sq['sub_content'][0]
-                can_select = sq['can_select'][0]
+                sub_content = sq[0]['sub_content'][0]
+                can_select = sq[0]['can_select'][0]
                 
                 SubQuestion(
                     top_question=question,
