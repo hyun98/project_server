@@ -73,6 +73,10 @@ class UserSerializer(serializers.ModelSerializer):
 
 class RegisterSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=150, write_only=True)
+    first_name = serializers.CharField(max_length=150, write_only=True)
+    last_name = serializers.CharField(max_length=150, write_only=True)
+    
+    gender = serializers.CharField(max_length=8, write_only=True)
     email = serializers.EmailField(write_only=True)
     password1 = serializers.CharField(write_only=True)
     password2 = serializers.CharField(write_only=True)
@@ -121,22 +125,21 @@ class RegisterSerializer(serializers.Serializer):
         data['password1'] = validate_password12(data['password1'], data['password2'])
         data['email'] = self.validate_email(data['email'])
         data['username'] = self.validate_username(data['username'])
-        print("check validate ALL")
-        
         return data
 
-    def get_cleaned_data(self):
-        return {
-            'username': self.validated_data.get('username', ''),
-            'password1': self.validated_data.get('password1', ''),
-            'email': self.validated_data.get('email', '')
-        }
+    # def get_cleaned_data(self):
+    #     return {
+    #         'username': self.validated_data.get('username', ''),
+    #         'password1': self.validated_data.get('password1', ''),
+    #         'email': self.validated_data.get('email', '')
+    #     }
         
     def create(self, validated_data):
         user = User.objects.create_user(
-            username=validated_data["username"],
-            email=validated_data["email"],
-            password=validated_data["password1"]
+            # username=validated_data["username"],
+            # email=validated_data["email"],
+            # password=validated_data["password1"],
+            validated_data
         )
         
         return user

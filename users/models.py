@@ -21,7 +21,11 @@ class UnicodeUsernameValidator(validators.RegexValidator):
 
 class UserManager(BaseUserManager):
     @transaction.atomic
-    def create_user(self, username, email, password=None, **extra_fields):
+    def create_user(self, validate_data):
+        username = validate_data["username"]
+        email = validate_data["email"]
+        password = validate_data["password"]
+        
         if not username:
             raise ValueError('아이디는 필수 항목입니다.')
         if not email:
@@ -37,13 +41,12 @@ class UserManager(BaseUserManager):
         user.set_password(password)
         user.full_clean()
         user.save()
-        profile = Profile(user=user, nickname=username)
+        profile = Profile.create_profile(user=user, data=validate_data)
         profile.save()
         
         return user
     
     def create_superuser(self, username, email=None, password=None):
-        
         user = self.create_user(
             email=self.normalize_email(email),
             username=username,
@@ -104,6 +107,11 @@ class Profile(models.Model):
         null=True, blank=True
     )
     introduce = models.TextField(null=True, blank=True)
+    GENDER_CHOICE = (
+        ("M", "남자"),
+        ("F", "여자")
+    )
+    gender = models.CharField(max_length=8, null=True, choices=GENDER_CHOICE)
     
     is_project = models.BooleanField(default=False)
     signup_path = models.CharField(max_length=64, default='basic')
@@ -116,3 +124,12 @@ class Profile(models.Model):
     def __str__(self):
         return self.user.username
     
+    def create_profile(self, user, data):
+        profile = Profile(
+            user=user,
+            realname=data["last_name"]+data["first_name"],
+            gender=data["gender"]
+        )
+        profile.save()
+        
+        return profile

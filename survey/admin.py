@@ -100,7 +100,10 @@ class ApplierAdmin(admin.ModelAdmin):
     inlines = (AnswerInline, ApplyFileInline, )
     
     def get_survey(self, obj):
-        survey = obj.survey.title
+        try:
+            survey = obj.survey.title
+        except:
+            survey = ''
         return survey
     get_survey.short_description = _("survey")
     

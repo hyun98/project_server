@@ -84,10 +84,11 @@ class SurveyApi(ApiAuthMixin, APIView):
             question.save()
             
             for sq in subquestion_list:
-                print(sq)
                 sub_content = sq['sub_content'][0]
+                if not sub_content:
+                    break
                 can_select = sq['can_select'][0]
-                
+            
                 SubQuestion(
                     top_question=question,
                     sub_content=sub_content,
@@ -134,8 +135,8 @@ class ApplyApi(PublicApiMixin, APIView):
         survey_id = kwargs['survey_id']
         survey = Survey.objects.get(pk=survey_id)
         
-        if not survey.has_permission(request.user):
-            return Response(status=status.HTTP_403_FORBIDDEN)
+        # if not survey.has_permission(request.user):
+        #     return Response(status=status.HTTP_403_FORBIDDEN)
         
         condition = Q(survey=survey)
         condition.add(Q(is_applied=True), Q.AND)
@@ -193,6 +194,7 @@ class ApplyApi(PublicApiMixin, APIView):
         answer_list = data.get('answers')
         
         for answer in answer_list:
+            print(answer)
             q_id = answer["question_id"][0]
             question = Question.objects.get(pk=q_id)
             ans = ", ".join(answer["answer"])

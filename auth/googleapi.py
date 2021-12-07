@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 
 from api.mixins import PublicApiMixin
-from users.utils import user_get_or_create
+from auth.utils import social_user_get_or_create
 from auth.services import google_get_access_token, google_get_user_info
 from auth.authenticate import jwt_login
 
@@ -48,7 +48,7 @@ class GoogleSigninCallBackApi(PublicApiMixin, APIView):
         }
 
         
-        user, _ = user_get_or_create(**profile_data)
+        user, _ = social_user_get_or_create(**profile_data)
 
         response = redirect(settings.BASE_FRONTEND_URL)
         response = jwt_login(response=response, user=user)

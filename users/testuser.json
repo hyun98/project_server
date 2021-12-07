@@ -1,0 +1,9 @@
+{
+    "username": "testuser",
+    "password1": "@qwerty1234",
+    "password2": "@qwerty1234",
+    "last_name": "조",
+    "first_name": "현우",
+    "gender": "M",
+    "email": "test@test.com"
+}

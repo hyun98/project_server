@@ -35,7 +35,7 @@ class LoginApi(PublicApiMixin, APIView):
         user = User.objects.filter(username=username).first()
         if user is None:
             return Response({
-                "message": "user not found"
+                "message": "유저를 찾을 수 없습니다"
             }, status=status.HTTP_404_NOT_FOUND)
         if not user.check_password(password):
             return Response({

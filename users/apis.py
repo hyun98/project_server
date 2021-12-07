@@ -113,7 +113,8 @@ class UserCreateApi(PublicApiMixin, APIView):
             return Response({
                 "message": "Request Body Error"
                 }, status=status.HTTP_409_CONFLICT)
-            
+        
+        print(serializer.validated_data)
         user = serializer.save()
         
         response = Response(status=status.HTTP_200_OK)

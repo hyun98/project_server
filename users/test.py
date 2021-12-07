@@ -6,12 +6,17 @@ from users.models import User, Profile
 
 
 class UserTest(APITestCase):
+    client = APIClient()
+    headers = {}
     
     def test_create_user(self):
-        user = User.objects.create_user('TEST', 'test@nav.com', 'test1234@')
-        self.assertIsInstance(user, User)
-        self.assertFalse(user.is_staff)
-        self.assertEqual(user.email, 'test@nav.com')
+        userfile = open('users/testuser.json', 'r')
+        userdata = json.load(userfile)
+        userfile.close()
+        response = self.client.post(
+            '/api/v1/users/me/', json.dumps(userdata), content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 201)
     
     def test_create_super_user(self):
         user = User.objects.create_superuser('TEST', 'test@nav.com', 'test1234@')
@@ -49,7 +54,6 @@ class ProfileTest(APITestCase):
         }
         
     def test_me_api(self):
-        
         response = self.client.get(
             '/api/v1/users/me',
             **self.headers, content_type = "application/json")
