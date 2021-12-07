@@ -76,7 +76,7 @@ class PostFileDownloadApi(PublicApiMixin, APIView):
             with open(file_url, 'rb') as f:
                 quote_file_url = urllib.parse.quote(file.filename.encode('utf-8'))
                 response = HttpResponse(
-                    f.read(), content_type=mimetypes.guess_type(file_url)[0]
+                    f.read(), content_type=mimetypes.guess_type(quote_file_url)[0]
                 )
                 response['Content-Disposition'] = 'attachment;filename*=UTF-8\'\'%s' % quote_file_url
                 

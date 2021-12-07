@@ -65,7 +65,9 @@ class SurveyApi(ApiAuthMixin, APIView):
         
         for q in question_list:
             content = q['content'][0]
+            description = q['description'][0]
             order = q['order'][0]
+            require = q['required'][0]
             is_multichoice = q['is_multichoice'][0]
             can_duplicate = q['can_duplicate'][0]
             subquestion_list = q['sub_question']
@@ -73,15 +75,18 @@ class SurveyApi(ApiAuthMixin, APIView):
             question = Question(
                 survey=survey,
                 content=content,
+                description=description,
                 order=order,
                 is_multichoice=is_multichoice,
+                required=require,
                 can_duplicate=can_duplicate
             )
             question.save()
             
             for sq in subquestion_list:
-                sub_content = sq[0]['sub_content'][0]
-                can_select = sq[0]['can_select'][0]
+                print(sq)
+                sub_content = sq['sub_content'][0]
+                can_select = sq['can_select'][0]
                 
                 SubQuestion(
                     top_question=question,
@@ -241,6 +246,7 @@ class ApplierCSVApi(PublicApiMixin, APIView):
         response = HttpResponse(content_type='text/csv', charset="utf-8")
         filename = "{}.csv".format("".join(survey.title.split()))
         filename = urllib.parse.quote(filename.encode('utf-8'))
+        
         response['Content-Disposition'] = "attachment; filename*=utf-8''{}".format(filename)
         applierDf.to_csv(path_or_buf=response)
         return response
@@ -311,9 +317,9 @@ class ApplierFileDownloadApi(PublicApiMixin, APIView):
             with open(file_url, 'rb') as f:
                 quote_file_url = urllib.parse.quote(file.filename.encode('utf-8'))
                 response = HttpResponse(
-                    f.read(), content_type=mimetypes.guess_type(file_url)[0]
+                    f.read(), content_type=mimetypes.guess_type(quote_file_url)[0]
                 )
-                response['Content-Disposition'] = 'attachment;filename*=UTF-8\'\'%s' % quote_file_url
+                response['Content-Disposition'] = 'attachment;filename*=utf-8\'\'%s' % quote_file_url
                 return response
         else:
             raise NotFound

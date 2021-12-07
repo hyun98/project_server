@@ -32,11 +32,11 @@ class ApplyFileInline(admin.StackedInline):
 class SurveyAdmin(admin.ModelAdmin):
     ordering = ('-created_date', )
     list_display = (
-        'title', 'description', 'start_date', 'due_date',
+        'id', 'title', 'description', 'start_date', 'due_date',
         'created_date', 'get_creator'
     )
     list_display_links = (
-        'title', 'description', 'start_date', 'due_date',
+        'id', 'title', 'description', 'start_date', 'due_date',
         'created_date', 'get_creator'
     )
     search_fields = ('title', 'description', 'creator__profile__nickname', )
@@ -58,11 +58,11 @@ class SurveyAdmin(admin.ModelAdmin):
 class QuestionAdmin(admin.ModelAdmin):
     ordering = ('-survey__start_date', 'order')
     list_display = (
-        'content', 'description', 'order', 'is_multichoice',
+        'id', 'content', 'description', 'order', 'is_multichoice',
         'required', 'can_duplicate'
     )
     list_display_links = (
-        'content', 'description', 'order', 'is_multichoice',
+        'id', 'content', 'description', 'order', 'is_multichoice',
         'required', 'can_duplicate'
     )
     search_fields = ('content', 'description', )
@@ -83,11 +83,11 @@ class QuestionAdmin(admin.ModelAdmin):
 class ApplierAdmin(admin.ModelAdmin):
     ordering = ('-apply_date', 'name')
     list_display = (
-        'get_survey', 'apply_date', 'name', 'birth', 'phone', 'univ', 'gender',
+        'id', 'get_survey', 'apply_date', 'name', 'birth', 'phone', 'univ', 'gender',
         'is_picked', 'is_favor', 'is_applied', 
     )
     list_display_links = (
-        'get_survey', 'apply_date', 'name', 'birth', 'phone', 'univ', 'gender',
+        'id', 'get_survey', 'apply_date', 'name', 'birth', 'phone', 'univ', 'gender',
         'is_picked', 'is_favor', 'is_applied', 
     )
     search_fields = ('name', 'univ', 'phone',)
@@ -108,7 +108,7 @@ class ApplierAdmin(admin.ModelAdmin):
 @admin.register(ApplyFile)
 class ApplyFileAdmin(admin.ModelAdmin):
     list_display = (
-        'get_apply_date', 'get_applier', 'filename',
+        'id', 'get_apply_date', 'get_applier', 'filename',
     )
     list_display_links = (
         'get_apply_date', 'get_applier', 'filename',
