@@ -25,6 +25,8 @@ class UserManager(BaseUserManager):
         username = validate_data["username"]
         email = validate_data["email"]
         password = validate_data["password1"]
+        first_name = validate_data['first_name']
+        last_name = validate_data['last_name']
         
         if not username:
             raise ValueError('아이디는 필수 항목입니다.')
@@ -36,6 +38,8 @@ class UserManager(BaseUserManager):
         
         user = self.model(
             username=username,
+            first_name=first_name,
+            last_name=last_name,
             email = self.normalize_email(email)
         )
         user.set_password(password)
