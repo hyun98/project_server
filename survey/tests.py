@@ -32,7 +32,7 @@ class SurveyCreateTest(APITestCase):
         }
     
     def test_survey(self):
-        jfile = open('survey/testsurvey.json', 'r')
+        jfile = open('testjson/testsurvey.json', 'r')
         data = json.load(jfile)
         jfile.close()
         

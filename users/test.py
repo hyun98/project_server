@@ -10,7 +10,7 @@ class UserTest(APITestCase):
     headers = {}
     
     def test_create_user(self):
-        userfile = open('users/testuser.json', 'r')
+        userfile = open('testjson/testuser.json', 'r')
         userdata = json.load(userfile)
         userfile.close()
         response = self.client.post(
