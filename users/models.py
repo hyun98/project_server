@@ -24,7 +24,7 @@ class UserManager(BaseUserManager):
     def create_user(self, validate_data):
         username = validate_data["username"]
         email = validate_data["email"]
-        password = validate_data["password"]
+        password = validate_data["password1"]
         
         if not username:
             raise ValueError('아이디는 필수 항목입니다.')
@@ -41,16 +41,20 @@ class UserManager(BaseUserManager):
         user.set_password(password)
         user.full_clean()
         user.save()
-        profile = Profile.create_profile(user=user, data=validate_data)
+        print(validate_data)
+        profile = Profile.create_profile(self, user=user, data=validate_data)
         profile.save()
         
         return user
     
     def create_superuser(self, username, email=None, password=None):
+        data = {}
+        data["email"] = email
+        data["username"] = username
+        data["password1"] = password
+        
         user = self.create_user(
-            email=self.normalize_email(email),
-            username=username,
-            password=password
+            validate_data=data
         )
         user.is_admin = True
         user.is_superuser = True
@@ -127,7 +131,7 @@ class Profile(models.Model):
     def create_profile(self, user, data):
         profile = Profile(
             user=user,
-            realname=data["last_name"]+data["first_name"],
+            realname = data["last_name"]+data["first_name"],
             gender=data["gender"]
         )
         profile.save()

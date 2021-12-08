@@ -16,7 +16,7 @@ class UserTest(APITestCase):
         response = self.client.post(
             '/api/v1/users/me/', json.dumps(userdata), content_type='application/json'
         )
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, 200)
     
     def test_create_super_user(self):
         user = User.objects.create_superuser('TEST', 'test@nav.com', 'test1234@')
