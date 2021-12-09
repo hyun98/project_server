@@ -204,17 +204,18 @@ class ApplyApi(PublicApiMixin, APIView):
             answer.answer=ans
             answer.save()
         
-        # 파일 저장
+        # 파일 저장. 임시저장인 경우 파일 저장 안됨
+        if not applier.is_applied:
+            return Response(status=status.HTTP_201_CREATED)
+        
         files = request.FILES.getlist('files')
-        ApplyFile.objects.filter(applier=applier).delete()
-        if files:
-            for file in files:
-                applyfile = ApplyFile(
-                    apply_file=file,
-                    filename=applier_str+file.name,
-                    applier=applier
-                )
-                applyfile.save()
+        for file in files:
+            applyfile = ApplyFile(
+                apply_file=file,
+                filename=applier_str+file.name,
+                applier=applier
+            )
+            applyfile.save()
         
         return Response(status=status.HTTP_201_CREATED)
 
@@ -400,11 +401,7 @@ class ApplierDuplicateCheck(PublicApiMixin, APIView):
         applier_name = request.data.get('name', '')[0]
         applier_phone = request.data.get('phone', '')[0]
         applier_birth = request.data.get('birth', '')[0]
-        
-        print(applier_birth)
-        print(applier_name)
-        print(applier_phone)
-        
+    
         if not applier_name or not applier_phone or not applier_birth:
             return Response(status=status.HTTP_404_NOT_FOUND)
     
@@ -423,7 +420,6 @@ class ApplierDuplicateCheck(PublicApiMixin, APIView):
         },status=status.HTTP_200_OK)
         
         applier = applier.first()
-        print(applier.is_applied)
         if not applier.is_applied:
             return Response({
                 "message": "임시 저장된 지원서가 존재합니다."
