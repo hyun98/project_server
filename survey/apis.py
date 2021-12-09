@@ -176,15 +176,16 @@ class ApplyApi(PublicApiMixin, APIView):
         survey_id = data.get('survey_id')[0]
         survey = Survey.objects.get(pk=survey_id)
         
-        applier = Applier(
+        applier = Applier.objects.get_or_create(
             name=applier_name,
             birth=applier_birth,
             phone=applier_phone,
-            gender=applier_gender,
-            univ=applier_univ,
-            is_applied=is_applied,
             survey=survey
         )
+        applier.gender=applier_gender
+        applier.univ=applier_univ
+        applier.is_applied=is_applied
+        
         applier.save()
         applier_str = applier_name + "_"
         
@@ -192,23 +193,22 @@ class ApplyApi(PublicApiMixin, APIView):
         answer_list = data.get('answers')
         
         for answer in answer_list:
-            print(answer)
             q_id = answer["question_id"][0]
             question = Question.objects.get(pk=q_id)
             ans = ", ".join(answer["answer"])
-            Answer(
-                answer=ans,
+            answer = Answer.objects.get_or_create(
                 question=question,
                 applier=applier,
                 survey=survey
-            ).save()
+            )
+            answer.answer=ans
+            answer.save()
         
         # 파일 저장
         files = request.FILES.getlist('files')
+        ApplyFile.objects.filter(applier=applier).delete()
         
         for file in files:
-            print("file", file)
-            print("filename : ", file.name)
             applyfile = ApplyFile(
                 apply_file=file,
                 filename=applier_str+file.name,
