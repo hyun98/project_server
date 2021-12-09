@@ -382,17 +382,28 @@ class ApplierSelfCheckApi(PublicApiMixin, APIView):
         },status=status.HTTP_404_NOT_FOUND)
         applier = applier.first()
         
+        from time import mktime
         today = datetime.datetime.now().strftime('%Y-%m-%d')
+        utc_today = mktime(today) * 1000
         due_date = survey.due_date
+        utc_due = mktime(due_date) * 1000
         applier_data = {}
         
-        if today <= due_date and not applier.is_applied:
-            applier_data = ApplierSerializer(applier).data
-        elif today > due_date and applier.is_applied:
-            applier_data["is_picked"] = applier.is_picked
         
-        applier_data["due_date"] = due_date
-        return Response(applier_data, status=status.HTTP_200_OK)
+        if today <= due_date and not applier.is_applied:
+            # 임시저장 정보 불러오기
+            applier_data = ApplierSerializer(applier).data
+            applier_data["due_date"] = due_date
+            return Response(applier_data, status=status.HTTP_200_OK)
+        elif today > due_date and applier.is_applied:
+            # 지원 기간이 지나서 합격 여부 불러오기
+            applier_data["is_picked"] = applier.is_picked
+            applier_data["due_date"] = due_date
+            return Response(applier_data, status=status.HTTP_200_OK)
+        
+        return Response({
+            "message": "정보를 불러올 수 없습니다."
+            },status=status.HTTP_403_FORBIDDEN)
 
 
 class ApplierDuplicateCheck(PublicApiMixin, APIView):
