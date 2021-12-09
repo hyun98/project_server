@@ -383,14 +383,16 @@ class ApplierSelfCheckApi(PublicApiMixin, APIView):
         applier = applier.first()
         
         today = datetime.datetime.today()
+        due_date = str(survey.due_date)
+        due_date = datetime.datetime.strptime(due_date, "%Y-%m-%d")
         applier_data = {}
         applier_data["due_date"] = survey.due_date
         
-        if today <= survey.due_date and not applier.is_applied:
+        if today <= due_date and not applier.is_applied:
             # 임시저장 정보 불러오기
             applier_data = ApplierSerializer(applier).data
             return Response(applier_data, status=status.HTTP_200_OK)
-        elif today > survey.due_date and applier.is_applied:
+        elif today > due_date and applier.is_applied:
             # 지원 기간이 지나서 합격 여부 불러오기
             applier_data["is_picked"] = applier.is_picked
             return Response(applier_data, status=status.HTTP_200_OK)
