@@ -27,12 +27,10 @@ class SurveyApi(ApiAuthMixin, APIView):
         """
         queryset = Survey.objects.select_related(
                 'creator'
-            ).\
-            prefetch_related(
+            ).prefetch_related(
                 'question',
                 'question__sub_question'
-            ).\
-            all()
+            ).all()
         
         serializer = SurveySerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -135,8 +133,8 @@ class ApplyApi(PublicApiMixin, APIView):
         survey_id = kwargs['survey_id']
         survey = Survey.objects.get(pk=survey_id)
         
-        # if not survey.has_permission(request.user):
-        #     return Response(status=status.HTTP_403_FORBIDDEN)
+        if not survey.has_permission(request.user):
+            return Response(status=status.HTTP_403_FORBIDDEN)
         
         condition = Q(survey=survey)
         condition.add(Q(is_applied=True), Q.AND)
@@ -232,15 +230,13 @@ class ApplierCSVApi(PublicApiMixin, APIView):
         
         question_list = Question.objects.filter(
             survey=survey
-        ).\
-        order_by('order')
+        ).order_by('order')
         applierDf = createApplierDF(question_list)
         
         applier_query = Applier.objects.prefetch_related(
             'answer',
             'answer__question'
-        ).\
-        filter(
+        ).filter(
             survey=survey
         ).order_by('apply_date')
         applierDf = addApplierDF(applier_query, applierDf)
@@ -268,20 +264,19 @@ class ApplierDetailApi(PublicApiMixin, APIView):
         
         survey = Survey.objects.get(pk=survey_id)
         
-        # if not survey.has_permission(request.user):
-        #     return Response(status=status.HTTP_403_FORBIDDEN)
+        if not survey.has_permission(request.user):
+            return Response(status=status.HTTP_403_FORBIDDEN)
         
         applier_query = Applier.objects.prefetch_related(
             'answer',
             'answer__question',
             'applyfile'
-        ).\
-        filter(
+        ).get(
             pk=applier_id,
             survey=survey
         )
         
-        applier_data = ApplierSerializer(applier_query, many=True).data
+        applier_data = ApplierSerializer(applier_query).data
         return Response(applier_data, status=status.HTTP_200_OK)
     
     def post(self, request, *args, **kwargs):
@@ -347,10 +342,17 @@ class ApplierFavorApi(PublicApiMixin, APIView):
         applier.save()
         
         return Response(status=status.HTTP_202_ACCEPTED)
-    
+
 
 class ApplierSelfCheckApi(PublicApiMixin, APIView):
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
+        """
+        지원자 자신의 정보를 모두 가져올 수 있다.
+        if 지원서의 지원 종료 기간 이전 && 지원자가 임시저장한 경우:
+            지원자의 모든 정보를 전달한다.
+        else if 지원서의 지원 종료기간 이후 && 지원자가 제대로 지원을 한 경우:
+            지원자의 합격 여부를 전달한다.
+        """
         survey_id = kwargs["survey_id"]
         applier_name = request.data.get('name', '')[0]
         applier_phone = request.data.get('phone', '')[0]
@@ -365,8 +367,7 @@ class ApplierSelfCheckApi(PublicApiMixin, APIView):
             'answer',
             'answer__question',
             'applyfile'
-        ).\
-        filter(
+        ).filter(
             name=applier_name,
             phone=applier_phone,
             birth=applier_birth,
@@ -377,7 +378,16 @@ class ApplierSelfCheckApi(PublicApiMixin, APIView):
             return Response({
             "message": "지원자 정보를 찾을 수 없습니다."
         },status=status.HTTP_404_NOT_FOUND)
+        applier = applier.first()
         
-        applier_data = ApplierSerializer(applier).data
-        applier_data["due_date"] = survey.due_date
+        today = datetime.datetime.now().strftime('%Y-%m-%d')
+        due_date = survey.due_date
+        applier_data = {}
+        
+        if today <= due_date and not applier.is_applied:
+            applier_data = ApplierSerializer(applier).data
+        elif today > due_date and applier.is_applied:
+            applier_data["is_picked"] = applier.is_picked
+        
+        applier_data["due_date"] = due_date
         return Response(applier_data, status=status.HTTP_200_OK)

@@ -6,7 +6,7 @@ v1_patterns = [
     path('users/', include('users.urls')),
     path('board/', include('boards.urls')),
     path('activity/', include('activity.urls')),
-    path('FAQs/', include('FAQs.urls')),
+    path('faqs/', include('FAQs.urls')),
     path('reservations/', include('reservations.urls')),
     path('survey/', include('survey.urls')),
     path('log/', include('logapp.urls')),

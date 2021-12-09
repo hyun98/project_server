@@ -23,6 +23,7 @@ media
 
 superuser.py
 dummydata.py
+codechecker.py
 testjson
 
 # If your build process includes running collectstatic, then you probably don't need or want to include staticfiles/
