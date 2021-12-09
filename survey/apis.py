@@ -419,11 +419,12 @@ class ApplierDuplicateCheck(PublicApiMixin, APIView):
         },status=status.HTTP_200_OK)
         
         applier = applier.first()
-        if applier.is_applied:
-            return Response({
-                "message": "이미 지원하였습니다."
-            },status=status.HTTP_200_OK)
-        else:
+        print(applier.is_applied)
+        if not applier.is_applied:
             return Response({
                 "message": "임시 저장된 지원서가 존재합니다."
             },status=status.HTTP_200_OK)
+        else:
+            return Response({
+                "message": "이미 지원하였습니다."
+            },status=status.HTTP_403_FORBIDDEN)
