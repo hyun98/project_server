@@ -401,6 +401,10 @@ class ApplierDuplicateCheck(PublicApiMixin, APIView):
         applier_phone = request.data.get('phone', '')[0]
         applier_birth = request.data.get('birth', '')[0]
         
+        print(applier_birth)
+        print(applier_name)
+        print(applier_phone)
+        
         if not applier_name or not applier_phone or not applier_birth:
             return Response(status=status.HTTP_404_NOT_FOUND)
     
