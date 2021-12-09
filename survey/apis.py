@@ -237,7 +237,8 @@ class ApplierCSVApi(PublicApiMixin, APIView):
             'answer',
             'answer__question'
         ).filter(
-            survey=survey
+            survey=survey,
+            is_applied=True
         ).order_by('apply_date')
         applierDf = addApplierDF(applier_query, applierDf)
         
@@ -391,3 +392,38 @@ class ApplierSelfCheckApi(PublicApiMixin, APIView):
         
         applier_data["due_date"] = due_date
         return Response(applier_data, status=status.HTTP_200_OK)
+
+
+class ApplierDuplicateCheck(PublicApiMixin, APIView):
+    def post(self, request, *args, **kwargs):
+        survey_id = kwargs["survey_id"]
+        applier_name = request.data.get('name', '')[0]
+        applier_phone = request.data.get('phone', '')[0]
+        applier_birth = request.data.get('birth', '')[0]
+        
+        if not applier_name or not applier_phone or not applier_birth:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+    
+        survey = Survey.objects.get(pk=survey_id)
+        
+        applier = Applier.objects.filter(
+            name=applier_name,
+            phone=applier_phone,
+            birth=applier_birth,
+            survey=survey
+        )
+        
+        if not applier.exists():
+            return Response({
+            "message": "지원 가능합니다."
+        },status=status.HTTP_200_OK)
+        
+        applier = applier.first()
+        if applier.is_applied:
+            return Response({
+                "message": "이미 지원하였습니다."
+            },status=status.HTTP_200_OK)
+        else:
+            return Response({
+                "message": "임시 저장된 지원서가 존재합니다."
+            },status=status.HTTP_200_OK)
