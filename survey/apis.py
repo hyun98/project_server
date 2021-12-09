@@ -383,8 +383,8 @@ class ApplierSelfCheckApi(PublicApiMixin, APIView):
         applier = applier.first()
         
         today = datetime.datetime.today()
-        due_date = str(survey.due_date)
-        due_date = datetime.datetime.strptime(due_date, "%Y-%m-%d")
+        due_date = str(survey.due_date) + " 00:00:00"
+        due_date = datetime.datetime.strptime(due_date, "%Y-%m-%d %H:%M:%S")
         applier_data = {}
         applier_data["due_date"] = survey.due_date
         
