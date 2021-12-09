@@ -176,7 +176,7 @@ class ApplyApi(PublicApiMixin, APIView):
         survey_id = data.get('survey_id')[0]
         survey = Survey.objects.get(pk=survey_id)
         
-        applier = Applier.objects.get_or_create(
+        applier, flag = Applier.objects.get_or_create(
             name=applier_name,
             birth=applier_birth,
             phone=applier_phone,
@@ -196,7 +196,7 @@ class ApplyApi(PublicApiMixin, APIView):
             q_id = answer["question_id"][0]
             question = Question.objects.get(pk=q_id)
             ans = ", ".join(answer["answer"])
-            answer = Answer.objects.get_or_create(
+            answer, flag = Answer.objects.get_or_create(
                 question=question,
                 applier=applier,
                 survey=survey
