@@ -382,21 +382,15 @@ class ApplierSelfCheckApi(PublicApiMixin, APIView):
         },status=status.HTTP_404_NOT_FOUND)
         applier = applier.first()
         
-        from time import mktime, strptime
         today = datetime.datetime.today()
-        # today = strptime(today, "%Y-%m-%d")
-        due_date = strptime(survey.due_date, "%Y-%m-%d") 
-        
-        utc_today = mktime(today) * 1000
-        utc_due = mktime(due_date) * 1000
         applier_data = {}
-        applier_data["due_date"] = due_date
+        applier_data["due_date"] = survey.due_date
         
-        if today <= due_date and not applier.is_applied:
+        if today <= survey.due_date and not applier.is_applied:
             # 임시저장 정보 불러오기
             applier_data = ApplierSerializer(applier).data
             return Response(applier_data, status=status.HTTP_200_OK)
-        elif today > due_date and applier.is_applied:
+        elif today > survey.due_date and applier.is_applied:
             # 지원 기간이 지나서 합격 여부 불러오기
             applier_data["is_picked"] = applier.is_picked
             return Response(applier_data, status=status.HTTP_200_OK)
