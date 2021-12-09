@@ -207,14 +207,14 @@ class ApplyApi(PublicApiMixin, APIView):
         # 파일 저장
         files = request.FILES.getlist('files')
         ApplyFile.objects.filter(applier=applier).delete()
-        
-        for file in files:
-            applyfile = ApplyFile(
-                apply_file=file,
-                filename=applier_str+file.name,
-                applier=applier
-            )
-            applyfile.save()
+        if files:
+            for file in files:
+                applyfile = ApplyFile(
+                    apply_file=file,
+                    filename=applier_str+file.name,
+                    applier=applier
+                )
+                applyfile.save()
         
         return Response(status=status.HTTP_201_CREATED)
 
