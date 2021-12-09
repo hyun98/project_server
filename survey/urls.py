@@ -2,7 +2,7 @@ from django.urls import path, include
 
 from survey.apis import (
     SurveyApi,
-    SurveyApi,
+    SurveyDetailApi,
     ApplyApi,
     ApplierDetailApi,
     ApplierFavorApi,
@@ -28,6 +28,6 @@ applier_urlpatterns = [
 
 urlpatterns = [
     path('', SurveyApi.as_view(), name='survey'),
-    path('<int:survey_id>', SurveyApi.as_view(), name='surveydetail'),
+    path('<int:survey_id>', SurveyDetailApi.as_view(), name='surveydetail'),
     path('<int:survey_id>/', include(applier_urlpatterns)),
 ]
