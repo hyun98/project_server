@@ -383,8 +383,8 @@ class ApplierSelfCheckApi(PublicApiMixin, APIView):
         applier = applier.first()
         
         from time import mktime, strptime
-        today = datetime.datetime.now().strftime('%Y-%m-%d')
-        today = strptime(today, "%Y-%m-%d")
+        today = datetime.datetime.today()
+        # today = strptime(today, "%Y-%m-%d")
         due_date = strptime(survey.due_date, "%Y-%m-%d") 
         
         utc_today = mktime(today) * 1000
