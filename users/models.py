@@ -45,26 +45,27 @@ class UserManager(BaseUserManager):
         user.set_password(password)
         user.full_clean()
         user.save()
-        print(validate_data)
         profile = Profile.create_profile(self, user=user, data=validate_data)
         profile.save()
         
         return user
     
     def create_superuser(self, username, email=None, password=None):
-        data = {}
-        data["email"] = email
-        data["username"] = username
-        data["password1"] = password
         
-        user = self.create_user(
-            validate_data=data
+        user = self.model(
+            username=username,
+            email = self.normalize_email(email)
         )
+        user.set_password(password)
+        user.full_clean()
         user.is_admin = True
         user.is_superuser = True
         user.is_staff = True
         user.save()
         
+        profile = Profile.create_profile(self, user=user, data={})
+        profile.save()
+    
         return user
 
 
@@ -133,10 +134,14 @@ class Profile(models.Model):
         return self.user.username
     
     def create_profile(self, user, data):
+        last_name = data.get("last_name", '')
+        first_name = data.get("first_name", '')
+        gender = data.get("gender", '')
+        
         profile = Profile(
             user=user,
-            realname = data["last_name"]+data["first_name"],
-            gender=data["gender"]
+            realname = last_name + first_name,
+            gender=gender
         )
         profile.save()
         

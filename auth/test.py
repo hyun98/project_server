@@ -11,7 +11,15 @@ class AuthTest(APITestCase):
     headers = {}
     
     def setUp(self):
-        user = User.objects.create_user(username='test', email='test@test.com', password='test')
+        data = {
+            'username': "test",
+            'email': "test@test.com",
+            'password1': "test",
+            'last_name': "a",
+            'first_name': "b",
+            'gender': "M"
+        }
+        user = User.objects.create_user(data)
         self.user = user
         
         
@@ -29,7 +37,7 @@ class AuthTest(APITestCase):
             'username': 'test',
         }
         response = self.client.post('/api/v1/auth/validate/username/', json.dumps(context), content_type='application/json')
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 403)
         
         context = {
             'username': 'test1',
@@ -42,7 +50,7 @@ class AuthTest(APITestCase):
             'email': 'test@test.com',
         }
         response = self.client.post('/api/v1/auth/validate/email/', json.dumps(context), content_type='application/json')
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 403)
         
         context = {
             'email': 'test1@test.com',
@@ -65,7 +73,7 @@ class AuthTest(APITestCase):
         self.assertNotEqual(self.token, '')
         self.assertNotEqual(self.csrftoken, '')
         
-        print("jwt_token : ", self.token)
-        print("csrf_token : ", self.csrftoken)
+        # print("jwt_token : ", self.token)
+        # print("csrf_token : ", self.csrftoken)
     
     

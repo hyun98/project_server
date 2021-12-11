@@ -93,22 +93,20 @@ class AdministratorAuthentication(SafeJWTAuthentication):
 
 
 class EmailorUsernameAuthBackend(backends.ModelBackend):
-    def authenticate(self, username, password=None, **kwargs):
+    def authenticate(self, request, username=None, password=None, **kwargs):
+        if username is None:
+            username = kwargs.get(User.USERNAME_FIELD)
+        if username is None or password is None:
+            return
         try:
             user = User.objects.get(
-                Q(username__iexact=username) |
-                Q(email__iexact=username)
+                Q(username__exact=username) |
+                Q(email__exact=username)
             )
-            if user.check_password(password):
+            if user.check_password(password) and self.user_can_authenticate(user):
                 return user
         except:
             return None
-    
-    def get_user(self, username):
-        try:
-            return User.objects.get(pk=username)
-        except User.DoesNotExist:
-            return None;
 
 
 def generate_access_token(user):

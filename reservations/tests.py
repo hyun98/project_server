@@ -11,31 +11,37 @@ class ReservationTest(APITestCase):
     headers = {}
     
     def setUp(self):
-        user = User.objects.create_user('test', 'test@test.com', 'test1234@')
+        data = {
+            'username': "admin",
+            'email': "admin@admin.com",
+            'password1': "admin",
+            'last_name': "a",
+            'first_name': "b",
+            'gender': "M"
+        }
+        user = User.objects.create_user(data)
         self.user = user
-        profile = Profile(user=user)
-        profile.save()
         
     
     ## ==== Reservation TEST ====
-    def test_reservation_date(self):
-        reservation = Reservation(
-            title="test", 
-            floor=1,
-            start_time="15:30",
-            end_time="20:30",
-            reserve_date="2021-09-20",
-            booker=User.objects.get(id=1),
-        )
-        reservation.save()
+    # def test_reservation_date(self):
+    #     reservation = Reservation(
+    #         title="test", 
+    #         floor=1,
+    #         start_time="15:30",
+    #         end_time="20:30",
+    #         reserve_date="2021-09-20",
+    #         booker=self.user,
+    #     )
+    #     reservation.save()
         
-        context = {
-            'date': "2021-09-20",
-        }
+    #     context = {
+    #         'date': "2021-09-20",
+    #     }
         
-        response = self.client.post(
-            '/api/v1/reservations/', 
-            json.dumps(context), **self.headers, content_type='application/json')
+    #     response = self.client.get(
+    #         '/api/v1/reservations/1', 
+    #         json.dumps(context), **self.headers, content_type='application/json')
         
-        self.assertEqual(response.status_code, 200)
+    #     self.assertEqual(response.status_code, 200)
     

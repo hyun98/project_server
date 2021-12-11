@@ -66,7 +66,6 @@ class UserMeApi(ApiAuthMixin, APIView):
         
         
         validated_data = serializer.validated_data
-        print(validated_data)
         serializer.update(user=user, validated_data=validated_data)
         return Response({
             "message": "Change password success"
@@ -114,7 +113,6 @@ class UserCreateApi(PublicApiMixin, APIView):
                 "message": "Request Body Error"
                 }, status=status.HTTP_409_CONFLICT)
         
-        print(serializer.validated_data)
         user = serializer.save()
         
         response = Response(status=status.HTTP_200_OK)

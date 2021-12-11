@@ -40,9 +40,6 @@ class SurveyApi(ApiAuthMixin, APIView):
         """
         지원서 생성
         """
-        if not request.user:
-            return Response(status=status.HTTP_403_FORBIDDEN)
-        
         title = request.data.get('title', '')[0]
         description = request.data.get('description', '')[0]
         start_date = request.data.get('start_date', '')[0]
@@ -96,7 +93,7 @@ class SurveyApi(ApiAuthMixin, APIView):
         return Response(status=status.HTTP_201_CREATED)
         
 
-class SurveyDetailApi(PublicApiMixin, APIView):
+class SurveyDetailApi(ApiAuthMixin, APIView):
     def get(self, request, *args, **kwargs):
         """
         id에 맞는 survey 선택
@@ -159,9 +156,6 @@ class ApplyApi(PublicApiMixin, APIView):
         3. sub_question이 있는 경우 -> 
             sub_question에서 선택하거나 적은 정보들을 모두 text로 answer에 저장.
         """
-        print("지원 상황: ", request.data.get('data'))
-        print("파일 : ", request.FILES)
-        
         data = json.loads(request.data.get('data'))
         
         # 지원자 정보
@@ -220,7 +214,7 @@ class ApplyApi(PublicApiMixin, APIView):
         return Response(status=status.HTTP_201_CREATED)
 
 
-class ApplierCSVApi(PublicApiMixin, APIView):
+class ApplierCSVApi(ApiAuthMixin, APIView):
     def get(self, request, *args, **kwargs):
         """
         survey/{설문지번호}/appliercsv
@@ -228,6 +222,9 @@ class ApplierCSVApi(PublicApiMixin, APIView):
         """
         survey_id = kwargs["survey_id"]
         survey = Survey.objects.get(pk=survey_id)
+        
+        if not survey.has_permission(request.user):
+            return Response(status=status.HTTP_403_FORBIDDEN)
         
         question_list = Question.objects.filter(
             survey=survey
@@ -252,7 +249,7 @@ class ApplierCSVApi(PublicApiMixin, APIView):
         return response
 
 
-class ApplierDetailApi(PublicApiMixin, APIView):
+class ApplierDetailApi(ApiAuthMixin, APIView):
     def get(self, request, *args, **kwargs):
         """
         ** 지원서를 만든 계정만 지원서를 볼 수 있음 **
@@ -302,12 +299,17 @@ class ApplierDetailApi(PublicApiMixin, APIView):
         return Response(status=status.HTTP_202_ACCEPTED)
 
 
-class ApplierFileDownloadApi(PublicApiMixin, APIView):
+class ApplierFileDownloadApi(ApiAuthMixin, APIView):
     def get(self, request, *args, **kwargs):
         """
         현재 설문지의 작성자와 로그인 되어있는 유저가 동일하면 다운로드 가능
         url로 전달받은 파일
         """
+        survey = Survey.objects.get(pk=kwargs["survey_id"])
+        
+        if not survey.has_permission(request.user):
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        
         file = get_object_or_404(ApplyFile, pk=kwargs['file_id'])
         url = file.apply_file.url[1:]
         file_url = urllib.parse.unquote(url)
@@ -324,7 +326,7 @@ class ApplierFileDownloadApi(PublicApiMixin, APIView):
             raise NotFound
 
 
-class ApplierFavorApi(PublicApiMixin, APIView):
+class ApplierFavorApi(ApiAuthMixin, APIView):
     def post(self, request, *args, **kwargs):
         """
         해당 지원자 관심 선택/해제

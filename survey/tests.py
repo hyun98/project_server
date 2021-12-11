@@ -1,3 +1,4 @@
+import datetime
 import json
 from rest_framework.test import APITestCase, APIClient
 
@@ -5,12 +6,12 @@ from users.models import User, Profile
 from survey.models import Survey, Question, SubQuestion, Applier, ApplyFile, Answer
 
 
-class SurveyCreateTest(APITestCase):
+class SurveyTest(APITestCase):
     client = APIClient()
     headers = {}
     
     def setUp(self):
-        user = User.objects.create_superuser('admin', 'admin@admin.com', 'admin')
+        user = User.objects.create_superuser(username="admin", email="admin@admin.com", password="admin")
         self.user = user
         
         user = {
@@ -30,7 +31,7 @@ class SurveyCreateTest(APITestCase):
             "HTTP_Authorization": "jwt " + self.token,
             "X-CSRFToken": self.csrftoken,
         }
-    
+        
     def test_survey(self):
         jfile = open('testjson/testsurvey.json', 'r')
         data = json.load(jfile)
@@ -45,16 +46,27 @@ class SurveyCreateTest(APITestCase):
             '/api/v1/survey/', 
             **self.headers, content_type='application/json')
         self.assertEqual(response.status_code, 200)
-        print(response.data)
+    
 
-
-class SurveyApplyTest(APITestCase):
+class SurveyApiTest(APITestCase):
     client = APIClient()
     headers = {}
-    
     def setUp(self):
-        return super().setUp()
+        user = User.objects.create_superuser(username="admin", email="admin@admin.com", password="admin")
+        Survey(
+            title = "test_survey",
+            description = "test1\ntest2",
+            start_date = "2021-10-01",
+            due_date = "2021-12-01",
+            created_date = datetime.datetime.now(),
+            creator = user
+        ).save()
     
-    def test_create_applier(self):
+    def test_survey_list(self):
+        response = self.client.get(
+            '/api/v1/survey/', 
+            **self.headers, content_type='application/json')
         
-        pass
+        self.assertEqual(response.status_code, 200)
+    
+    

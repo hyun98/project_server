@@ -48,7 +48,9 @@ class ReserveApi(ApiAuthMixin, APIView):
             "data":data_list,
             
         }, status=status.HTTP_200_OK)
-        
+
+
+class ReserveCreateApi(PublicApiMixin, APIView):
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         """

@@ -10,6 +10,7 @@ project.crt
 project.key
 local.docker-compose.yml
 logs
+.coveragerc
 
 ### Django ###
 *.log

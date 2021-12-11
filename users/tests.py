@@ -30,10 +30,16 @@ class ProfileTest(APITestCase):
     headers = {}
     
     def setUp(self):
-        user = User.objects.create_user('TEST', 'test@nav.com', 'test1234@')
+        data = {
+            'username': "TEST",
+            'email': "test@nav.com",
+            'password1': "test1234@",
+            'last_name': "a",
+            'first_name': "b",
+            'gender': "M"
+        }
+        user = User.objects.create_user(data)
         self.user = user
-        profile = Profile(user=user)
-        profile.save()
         
         user = {
             "username": "TEST",
@@ -58,14 +64,13 @@ class ProfileTest(APITestCase):
             '/api/v1/users/me',
             **self.headers, content_type = "application/json")
         self.assertEqual(response.status_code, 200)
-        print(response.data)
         
     
     def test_change_password(self):
         context = {
             "oldpassword": "test1234@",
-            "newpassword1": "test",
-            "newpassword2": "test",
+            "newpassword1": "test12345@",
+            "newpassword2": "test12345@",
         }
         
         response = self.client.put(
@@ -82,7 +87,7 @@ class ProfileTest(APITestCase):
         response = self.client.delete(
             '/api/v1/users/me',
             json.dumps(context), **self.headers, content_type="application/json")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 204)
             
     
 

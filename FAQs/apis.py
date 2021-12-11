@@ -13,19 +13,18 @@ class FAQslistAPI(PublicApiMixin, APIView):
         FAQ 리스트 반환
         question : answer
         """
-        QA_list = Question.objects.all()
+        QA_list = Question.objects.select_related(
+            'answer'
+        ).all()
         
         data_list = []
         
         for qa in QA_list:
-            answer = Answer.objects.get(question=qa)
             temp = {
                 'question': qa.question,
-                'answer': answer.answer
+                'answer': qa.answer.answer
             }
-            
             data_list.append(temp)
-            
-        return Response(data_list, status=status.HTTP_200_OK)
-        
+        data = {"faqs": data_list}
+        return Response(data, status=status.HTTP_200_OK)
         

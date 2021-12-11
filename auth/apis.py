@@ -118,7 +118,7 @@ class username_duplicate_checkApi(PublicApiMixin, APIView):
         if user.exists():
             return Response({
                 "message": "There is an ID registered with that username"
-            }, status=status.HTTP_400_BAD_REQUEST)
+            }, status=status.HTTP_403_FORBIDDEN)
         
         return Response({
             "message": "Allowed username"
@@ -144,7 +144,7 @@ class email_duplicate_checkApi(PublicApiMixin, APIView):
         if user.exists():
             return Response({
                 "message": "There is an ID registered with that email"
-            }, status=status.HTTP_400_BAD_REQUEST)
+            }, status=status.HTTP_403_FORBIDDEN)
         
         return Response({
             "message": "Allowed email"
