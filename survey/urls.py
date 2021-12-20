@@ -4,6 +4,7 @@ from survey.apis import (
     SurveyApi,
     SurveyDetailApi,
     ApplyApi,
+    ApplierListApi,
     ApplierDetailApi,
     ApplierFavorApi,
     ApplierCSVApi,
@@ -16,6 +17,7 @@ app_name = "survey"
 
 applier_urlpatterns = [
     path('applier', ApplyApi.as_view(), name='apply'),
+    path('applierlist', ApplierListApi.as_view(), name='applierlist'),
     path('applier/<int:applier_id>', ApplierDetailApi.as_view(), name='applier'),
     path('applierfavor/<int:applier_id>', ApplierFavorApi.as_view(), name='applierfavor'),
     

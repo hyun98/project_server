@@ -118,7 +118,7 @@ class SurveyDetailApi(ApiAuthMixin, APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class ApplyApi(PublicApiMixin, APIView):
+class ApplierListApi(ApiAuthMixin, APIView):
     def get(self, request, *args, **kwargs):
         """
         지원자 전체 리스트로 확인
@@ -146,6 +146,8 @@ class ApplyApi(PublicApiMixin, APIView):
         
         return Response(serializer.data, status=status.HTTP_200_OK)
     
+
+class ApplyApi(PublicApiMixin, APIView):
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         """
