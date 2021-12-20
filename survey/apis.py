@@ -2,7 +2,6 @@ import urllib
 import os
 import json
 import mimetypes
-from datetime import datetime
 
 from rest_framework import status
 from rest_framework.views import APIView
@@ -159,6 +158,7 @@ class ApplyApi(PublicApiMixin, APIView):
         3. sub_question이 있는 경우 -> 
             sub_question에서 선택하거나 적은 정보들을 모두 text로 answer에 저장.
         """
+        
         data = json.loads(request.data.get('data'))
         
         # 지원자 정보
@@ -172,6 +172,13 @@ class ApplyApi(PublicApiMixin, APIView):
         # 지원서 정보
         survey_id = data.get('survey_id')[0]
         survey = Survey.objects.get(pk=survey_id)
+        
+        today = datetime.datetime.today()
+        due_date = str(survey.due_date) + " 23:59:59"
+        due_date = datetime.datetime.strptime(due_date, "%Y-%m-%d %H:%M:%S")
+        
+        if(today > due_date):
+            return Response(status=status.HTTP_403_FORBIDDEN)
         
         applier, flag = Applier.objects.get_or_create(
             name=applier_name,
