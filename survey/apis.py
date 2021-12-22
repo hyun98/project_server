@@ -407,6 +407,7 @@ class ApplierSelfCheckApi(PublicApiMixin, APIView):
         elif today > due_date and applier.is_applied:
             # 지원 기간이 지나서 합격 여부 불러오기
             applier_data["is_picked"] = applier.is_picked
+            applier_data["name"] = applier_name
             return Response(applier_data, status=status.HTTP_200_OK)
         
         return Response({
