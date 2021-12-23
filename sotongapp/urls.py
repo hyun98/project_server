@@ -2,7 +2,7 @@ from django.urls import path
 from django.urls.conf import include
 from rest_framework import routers
 from sotongapp.apis import AllUserCount, GetOrganName,\
-    GetVisitorView, InfoViewSet, SaveTempDataApi
+    GetVisitorView, InfoViewSet, SaveTempDataApi, makeSampleData
 
 app_name = 'sotongapp'
 
@@ -16,4 +16,6 @@ urlpatterns = [
     path('usercnt/', AllUserCount),
     path('organ/<str:urlname>', GetOrganName),
     path('visitor/<str:urlname>', GetVisitorView.as_view()),
+    path('sampledata/<str:pw>', makeSampleData.as_view()),
+
 ]
