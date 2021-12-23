@@ -20,6 +20,6 @@ def get_maxvnum_avgnum(total, organ):
             day_total += 1
             max_visitor = max(max_visitor, day_query_count)
     
-    avg_user_num = total / day_total
+    avg_user_num = round(total / day_total, 2)
     
     return avg_user_num, max_visitor
