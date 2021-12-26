@@ -7,8 +7,8 @@
     <title>지원자리스트</title>
 </head>
 <body>
-    <div style="line-height: calc(1ex/0.3); margin: 0 auto">
-        <div style="text-align: center; margin-bottom: 2rem; margin-top: 2rem;">
+    <div style="text-align: center; line-height: calc(1ex/0.3); margin: 0 auto">
+        <div style="margin-bottom: 2rem; margin-top: 2rem;">
             <form id="searchForm" method="GET" action="{% url 'survey:applierlist' %}">
                 <input type="text" id="kw" name="kw" placeholder="name/univ" value="{{ kw|default_if_none:'' }}">
                 <input type="text" id="pw" name="pw" placeholder="password" value="{{ pw|default_if_none:'' }}">
