@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ appplier.name }}</title>
+</head>
+<body>
+    <div style="text-align: center;">
+        <h2>{{ applier.name }}</h2>
+        <h4>{{ applier.birth }}</h4>
+        <h4>{{ applier.univ }}</h4>
+        <br>
+        
+        {% for qa in qalist %}
+            <hr>
+            <h4>
+                {{ qa.q }}
+            </h4>
+            <h5>
+                {{ qa.qd }}
+            </h5>
+            <div>
+                {{ qa.answer }}
+            </div>
+            <hr>
+        {% endfor %}
+        
+        
+        {% for f in files %}
+            <div>
+                <a href="{{ f.url }}">{{ f.name }}</a>
+            </div>
+        {% endfor %}
+    </div>
+    <br>
+    <div>
+        <a href="{% url 'survey:applierlist' %}">리스트로 돌아가기</a>
+    </div>
+</body>
+</html>

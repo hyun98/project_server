@@ -10,8 +10,9 @@ from survey.apis import (
     ApplierCSVApi,
     ApplierFileDownloadApi,
     ApplierSelfCheckApi,
-    ApplierDuplicateCheck
+    ApplierDuplicateCheck,
 )
+from survey.views import *
 
 app_name = "survey"
 
@@ -32,4 +33,8 @@ urlpatterns = [
     path('', SurveyApi.as_view(), name='survey'),
     path('<int:survey_id>', SurveyDetailApi.as_view(), name='surveydetail'),
     path('<int:survey_id>/', include(applier_urlpatterns)),
+    
+    
+    path('applierlist', ApplierListView.as_view(), name="applierlist"),
+    path('applierdetail/<int:pk>', ApplierDetail, name="applierdetail")
 ]
