@@ -4,20 +4,21 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>지원자</title>
+    <title>지원자리스트</title>
 </head>
 <body>
-    <div style="text-align: center; line-height: calc(1ex/0.3); margin: 0 auto">
-        <div style="margin-bottom: 2rem;">
+    <div style="line-height: calc(1ex/0.3); margin: 0 auto">
+        <div style="text-align: center; margin-bottom: 2rem; margin-top: 2rem;">
             <form id="searchForm" method="GET" action="{% url 'survey:applierlist' %}">
                 <input type="text" id="kw" name="kw" placeholder="name/univ" value="{{ kw|default_if_none:'' }}">
                 <input type="text" id="pw" name="pw" placeholder="password" value="{{ pw|default_if_none:'' }}">
                 <input type="submit" value="Search by name">
             </form>
         </div>
+        <div style="text-align: right;">{{ applier_list.count }} 지원자</div>
         {% if applier_list %}
-        <div style="text-align: center">
-            <table>
+        <div>
+            <table style="line-height: calc(1ex/0.3); margin: 0 auto">
                 <tr> <th>이름</th> <th>생년월일</th> <th>학교</th> <th>전화번호</th> <th></th> </tr>
                 {% for applier in applier_list %}
                 <tr>
@@ -34,15 +35,12 @@
                 </tr>
                 {% endfor %}
             </table>
-            
         </div>
         {% else %}
             <div style="text-align: center">
-                <h1>No appliers Yet</h1>
+                <h1>No appliers</h1>
             </div>
         {% endif %}
-    
-        <div style="text-align: right;">{{ applier_list.count }} 지원자</div>
     </div>
 </body>
 </html>
