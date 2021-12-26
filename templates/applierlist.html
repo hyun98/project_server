@@ -29,8 +29,6 @@
                         {% csrf_token %}
                         <input type="submit" value="보기">
                     </form>
-                    <!-- <a href="{% url 'survey:applierdetail' applier.pk %}"> -->
-                    
                 </a></td>
             </tr>
             {% endfor %}
@@ -43,7 +41,6 @@
         </div>
     {% endif %}
 
-    {% include 'pagination.html' with page_obj=page_obj %}
     <div style="text-align: right;">{{ applier_list.count }} 지원자</div>
 </body>
 </html>

@@ -17,19 +17,17 @@ class ApplierListView(ListView):
     model = Applier
     context_object_name = 'applier_list'
     template_name = 'applierlist.html'
-    paginate_by = 10
     
     def get_queryset(self):
         kw = self.request.GET.get('kw', '')
         pw = self.request.GET.get('pw', '')
         if pw != settings.SURVEY_PW:
-            print("no")
             return Applier.objects.none()
         
         Applier_queryset = Applier.objects.order_by('name')
         if kw:
             Applier_queryset = Applier_queryset.filter(
-                Q(name__contains=kw) | Q(univ__contains=kw),
+                (Q(name__contains=kw) | Q(univ__contains=kw)),
                 is_picked=True
             ).distinct()
             
