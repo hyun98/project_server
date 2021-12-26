@@ -7,40 +7,42 @@
     <title>지원자</title>
 </head>
 <body>
-    <div style="margin-bottom: 2rem;">
-        <form id="searchForm" method="GET" action="{% url 'survey:applierlist' %}">
-            <input type="text" id="kw" name="kw" placeholder="name/univ" value="{{ kw|default_if_none:'' }}">
-            <input type="text" id="pw" name="pw" placeholder="password" value="{{ pw|default_if_none:'' }}">
-            <input type="submit" value="Search by name">
-        </form>
-    </div>
-    {% if applier_list %}
-    <div style="text-align: center">
-        <table>
-            <tr> <th>이름</th> <th>생년월일</th> <th>학교</th> <th>전화번호</th> <th></th> </tr>
-            {% for applier in applier_list %}
-            <tr>
-                <td>{{ applier.name }}</td>
-                <td>{{ applier.birth }}</td>
-                <td>{{ applier.univ }}</td>
-                <td>{{ applier.phone }}</td>
-                <td>
-                    <form action="{% url 'survey:applierdetail' applier.pk %}" method="POST">
-                        {% csrf_token %}
-                        <input type="submit" value="보기">
-                    </form>
-                </a></td>
-            </tr>
-            {% endfor %}
-        </table>
-        
-    </div>
-    {% else %}
-        <div style="text-align: center">
-            <h1>No appliers Yet</h1>
+    <div style="text-align: center; line-height: calc(1ex/0.3); margin: 0 auto">
+        <div style="margin-bottom: 2rem;">
+            <form id="searchForm" method="GET" action="{% url 'survey:applierlist' %}">
+                <input type="text" id="kw" name="kw" placeholder="name/univ" value="{{ kw|default_if_none:'' }}">
+                <input type="text" id="pw" name="pw" placeholder="password" value="{{ pw|default_if_none:'' }}">
+                <input type="submit" value="Search by name">
+            </form>
         </div>
-    {% endif %}
-
-    <div style="text-align: right;">{{ applier_list.count }} 지원자</div>
+        {% if applier_list %}
+        <div style="text-align: center">
+            <table>
+                <tr> <th>이름</th> <th>생년월일</th> <th>학교</th> <th>전화번호</th> <th></th> </tr>
+                {% for applier in applier_list %}
+                <tr>
+                    <td>{{ applier.name }}</td>
+                    <td>{{ applier.birth }}</td>
+                    <td>{{ applier.univ }}</td>
+                    <td>{{ applier.phone }}</td>
+                    <td>
+                        <form action="{% url 'survey:applierdetail' applier.pk %}" method="POST">
+                            {% csrf_token %}
+                            <input type="submit" value="보기">
+                        </form>
+                    </a></td>
+                </tr>
+                {% endfor %}
+            </table>
+            
+        </div>
+        {% else %}
+            <div style="text-align: center">
+                <h1>No appliers Yet</h1>
+            </div>
+        {% endif %}
+    
+        <div style="text-align: right;">{{ applier_list.count }} 지원자</div>
+    </div>
 </body>
 </html>
