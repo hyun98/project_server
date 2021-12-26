@@ -28,13 +28,15 @@ class ApplierListView(ListView):
         if kw:
             Applier_queryset = Applier_queryset.filter(
                 (Q(name__contains=kw) | Q(univ__contains=kw)),
-                is_picked=True
+                is_picked=True,
+                is_applied=True
             ).distinct()
             
             return Applier_queryset
         else:
             Applier_queryset = Applier_queryset.filter(
-                is_picked=True
+                is_picked=True,
+                is_applied=True
             )
             return Applier_queryset
 
