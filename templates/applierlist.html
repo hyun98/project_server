@@ -5,6 +5,17 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>지원자리스트</title>
+    <style>
+        table {
+          width: 50%;
+          border: 1px solid #444444;
+          border-collapse: collapse;
+        }
+        th, td {
+          border-bottom: 1px solid #444444;
+          padding: 5px;
+        }
+      </style>
 </head>
 <body>
     <div style="text-align: center; line-height: calc(1ex/0.3); margin: 0 auto">
@@ -18,7 +29,7 @@
         <div style="text-align: right;">{{ applier_list.count }} 지원자</div>
         {% if applier_list %}
         <div>
-            <table style="line-height: calc(1ex/0.3); margin: 0 auto">
+            <table style="line-height: calc(1ex/0.3); border: 1px solid; border-collapse: collapse; margin: 0 auto">
                 <tr> <th>이름</th> <th>생년월일</th> <th>학교</th> <th>전화번호</th> <th></th> </tr>
                 {% for applier in applier_list %}
                 <tr>

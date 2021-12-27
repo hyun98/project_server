@@ -51,6 +51,7 @@ def ApplierDetail(request, pk):
     questions = Question.objects.filter(survey=survey).order_by('order')
     
     context = {
+        'survey': survey,
         'applier': applier,
         'qalist': [], 
         'files': []
