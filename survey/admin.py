@@ -84,14 +84,14 @@ class ApplierAdmin(admin.ModelAdmin):
     ordering = ('-apply_date', 'name')
     list_display = (
         'id', 'get_survey', 'apply_date', 'name', 'birth', 'phone', 'univ', 'gender',
-        'is_picked', 'is_favor', 'is_applied', 
+        'first_picked', 'finaly_picked', 'is_favor', 'is_applied', 
     )
     list_display_links = (
         'id', 'get_survey', 'apply_date', 'name', 'birth', 'phone', 'univ', 'gender',
-        'is_picked', 'is_favor', 'is_applied', 
+        'first_picked', 'finaly_picked', 'is_favor', 'is_applied', 
     )
     search_fields = ('name', 'univ', 'phone',)
-    list_filter = ('univ', 'is_picked', 'is_favor', 'is_applied')
+    list_filter = ('univ', 'first_picked', 'finaly_picked', 'is_favor', 'is_applied')
     
     list_select_related = [
         'survey',

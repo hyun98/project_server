@@ -17,7 +17,7 @@ from django.shortcuts import get_object_or_404
 from api.mixins import ApiAuthMixin, PublicApiMixin
 from survey.serializers import *
 from survey.models import *
-from survey.services import createApplierDF, addApplierDF
+from survey.utils import createApplierDF, addApplierDF
 
 
 class SurveyApi(ApiAuthMixin, APIView):
@@ -159,6 +159,7 @@ class ApplyApi(PublicApiMixin, APIView):
             sub_question에서 선택하거나 적은 정보들을 모두 text로 answer에 저장.
         """
         
+        print(request.data.get('data'))
         data = json.loads(request.data.get('data'))
         
         # 지원자 정보
@@ -290,7 +291,7 @@ class ApplierDetailApi(ApiAuthMixin, APIView):
     
     def post(self, request, *args, **kwargs):
         """
-        해당 지원자 합/불
+        해당 지원자 1차 합/불
         """
         applier_id = kwargs["applier_id"]
         survey_id = kwargs["survey_id"]
@@ -300,10 +301,10 @@ class ApplierDetailApi(ApiAuthMixin, APIView):
             survey=survey
         )
         
-        if applier.is_picked:
-            applier.is_picked = False
+        if applier.first_picked:
+            applier.first_picked = False
         else:
-            applier.is_picked = True
+            applier.first_picked = True
         applier.save()
         
         return Response(status=status.HTTP_202_ACCEPTED)
@@ -406,7 +407,7 @@ class ApplierSelfCheckApi(PublicApiMixin, APIView):
             return Response(applier_data, status=status.HTTP_200_OK)
         elif today > due_date and applier.is_applied:
             # 지원 기간이 지나서 합격 여부 불러오기
-            applier_data["is_picked"] = applier.is_picked
+            applier_data["finaly_picked"] = applier.finaly_picked
             applier_data["name"] = applier_name
             return Response(applier_data, status=status.HTTP_200_OK)
         

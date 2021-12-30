@@ -20,7 +20,7 @@
 <body>
     <div style="text-align: center; line-height: calc(1ex/0.3); margin: 0 auto">
         <div style="margin-bottom: 2rem; margin-top: 2rem;">
-            <form id="searchForm" method="GET" action="{% url 'survey:applierlist' %}">
+            <form id="searchForm" method="GET" action="{% url 'survey:list' %}">
                 <input type="text" id="kw" name="kw" placeholder="name/univ" value="{{ kw|default_if_none:'' }}">
                 <input type="text" id="pw" name="pw" placeholder="password" value="{{ pw|default_if_none:'' }}">
                 <input type="submit" value="Search by name">
@@ -38,7 +38,7 @@
                     <td>{{ applier.univ }}</td>
                     <td>{{ applier.phone }}</td>
                     <td>
-                        <form action="{% url 'survey:applierdetail' applier.pk %}" method="POST">
+                        <form action="{% url 'survey:detail' applier.pk %}" method="POST">
                             {% csrf_token %}
                             <input type="submit" value="보기">
                         </form>

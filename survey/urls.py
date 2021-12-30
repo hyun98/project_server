@@ -35,6 +35,7 @@ urlpatterns = [
     path('<int:survey_id>/', include(applier_urlpatterns)),
     
     
-    path('applierlist', ApplierListView.as_view(), name="applierlist"),
-    path('applierdetail/<int:pk>', ApplierDetail, name="applierdetail")
+    path('applierlist', ApplierListView.as_view(), name="list"),
+    path('applierdetail/<int:pk>', ApplierDetail, name="detail"),
+    path('applierdetail/<int:pk>/finalpick', ApplierFinalPick, name="finalpick"),
 ]

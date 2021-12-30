@@ -28,14 +28,14 @@ class ApplierListView(ListView):
         if kw:
             Applier_queryset = Applier_queryset.filter(
                 (Q(name__contains=kw) | Q(univ__contains=kw)),
-                is_picked=True,
+                first_picked=True,
                 is_applied=True
             ).distinct()
             
             return Applier_queryset
         else:
             Applier_queryset = Applier_queryset.filter(
-                is_picked=True,
+                first_picked=True,
                 is_applied=True
             )
             return Applier_queryset
@@ -74,3 +74,25 @@ def ApplierDetail(request, pk):
         context['files'].append(temp)
     
     return render(request, 'applierdetail.html', context=context)
+
+
+def ApplierFinalPick(request, pk):
+    print(request.method)
+    if request.method != 'POST':
+        return HttpResponse("403 Forbidden")
+    
+    applier = Applier.objects.get(pk=pk)
+    
+    print("before: ",applier.finaly_picked)
+    
+    if not applier.finaly_picked:
+        applier.finaly_picked = True
+    else:
+        applier.finaly_picked = False
+        
+    applier.save()
+    print("after: ",applier.finaly_picked)
+    
+    response = redirect('survey:list')
+    response['Location'] += f'?pw={settings.SURVEY_PW}'
+    return response

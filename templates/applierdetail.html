@@ -5,6 +5,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ appplier.name }}</title>
+    <style>
+        input:active { 
+            position: relative; top:2px; 
+        }
+
+    </style>
 </head>
 <body>
     <div style="text-align: center; width: 50%; line-height: calc(1ex/0.3); margin: 0 auto">
@@ -14,6 +20,18 @@
         <h2>{{ applier.name }}</h2>
         <h4>{{ applier.birth }}</h4>
         <h4>{{ applier.univ }}</h4>
+        <form action="{% url 'survey:finalpick' applier.pk %}" method="POST">
+            {% csrf_token %}
+            {% if applier.finaly_picked %}
+                <input style="background-color: tomato; color: white;
+                            border: solid 2px tomato; border-radius: 8px;"
+                             type="submit" value="합격 취소">
+            {% else %}
+                <input style="background-color: forestgreen; color: white;
+                            border: solid 2px forestgreen; border-radius: 8px;"
+                            type="submit" value="최종 합격">
+            {% endif %}
+        </form>
         <br>
         
         {% for qa in qalist %}

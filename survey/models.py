@@ -54,9 +54,10 @@ class Applier(models.Model):
     birth = models.CharField(max_length=32, null=True, blank=True)
     phone = models.CharField(max_length=32, null=True, blank=True)
     univ = models.CharField(max_length=32, null=True, blank=True)
-    is_applied = models.BooleanField(default=False)
-    is_picked = models.BooleanField(default=False)
-    is_favor = models.BooleanField(default=False)
+    is_applied = models.BooleanField("지원 여부", default=False)
+    first_picked = models.BooleanField("1차 선발 여부", default=False)
+    finaly_picked = models.BooleanField("최종 선발 여부", default=False)
+    is_favor = models.BooleanField("관심 지원자", default=False)
     
     apply_date = models.DateTimeField(auto_now_add=True)
     
@@ -70,12 +71,26 @@ class Applier(models.Model):
     
     class Meta:
         verbose_name = '지원자'
-        verbose_name_plural = '지원자'
+        verbose_name_plural = verbose_name
         ordering = ['-apply_date']
     
     def __str__(self):
         return self.name
+
+
+class Comment(models.Model):
+    comment = models.TextField(max_length=2000, default='')
+    created_time = models.DateTimeField(auto_now_add=True)
+    modified_time = models.DateTimeField(auto_now=True)
+    applier = models.ManyToManyField(Applier, related_name='comment')
     
+    def __str__(self):
+        return self.comment
+    
+    class Meta:
+        verbose_name = '지원자'
+        verbose_name_plural = verbose_name
+
 
 class Answer(models.Model):
     answer = models.TextField(default="", null=True, blank=True)

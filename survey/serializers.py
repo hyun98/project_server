@@ -52,8 +52,8 @@ class ApplierSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ApplierListSerializer(serializers.ModelSerializer):    
+class ApplierListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Applier
         fields = ['id', 'name', 'birth', 'gender', 'univ',\
-            'phone', 'apply_date', 'is_favor', 'is_picked']
+            'phone', 'apply_date', 'is_favor', 'first_picked', 'finaly_picked']
