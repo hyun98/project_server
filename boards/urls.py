@@ -1,36 +1,44 @@
 from django.urls import path, include
 
-from boards.api_category import CategoryCreateReadApi, CategoryManageApi
-from boards.api_post import PostCreateApi, PostManageApi, PostFileDownloadApi
-from boards.api_comment import CommentCreateApi, CommentManageApi
-from boards.api_reply import ReplyCreateApi, ReplyManageApi
-
-# start :  ~board/
-
-reply_urlpatterns = [
-    path('reply', ReplyCreateApi.as_view(), name="reply_create"),
-    path('reply/<int:reply_id>', ReplyManageApi.as_view(), name="reply_manage"),
+from boards.apis import (
+    CategoryCreateReadApi,
+    CategoryDetailApi,
+    PostCreateReadApi,
+    PostDetailApi,
     
-]
+)
 
-comment_urlpatterns = [
-    path('comment', CommentCreateApi.as_view(), name="comment_create"),
-    path('comment/<int:comment_id>', CommentManageApi.as_view(), name="comment_manage"),
-    path('comment/<int:comment_id>/', include(reply_urlpatterns)),
-    
-]
 
-post_urlpatterns = [
-    path('post', PostCreateApi.as_view(), name="post_create"),
-    path('post/<int:post_id>', PostManageApi.as_view(), name="post_manage"),
-    path('post/<int:post_id>/', include(comment_urlpatterns)),
-    
-]
+CategoryCreateReadViewset = CategoryCreateReadApi.as_view({
+    'get': 'list',
+    'post': 'create'
+})
+
+CategoryDetailViewset = CategoryDetailApi.as_view({
+    'get': 'retrieve',
+    'put': 'update',
+    'delete': 'destroy'
+})
+
+PostCreateReadViewset = PostCreateReadApi.as_view({
+    'get': 'list',
+    'post': 'create'
+})
+
+PostDetailViewset = PostDetailApi.as_view({
+    'get': 'retrieve',
+    'post': 'like',
+    'put': 'update',
+    'delete': 'destroy'
+})
+
+
 
 urlpatterns = [
-    path('', CategoryCreateReadApi.as_view(), name="category_create"),
-    path('<int:cate_id>', CategoryManageApi.as_view(), name="category_manage"),
-    path('<int:cate_id>/', include(post_urlpatterns)),
-    path('file/<int:file_id>', PostFileDownloadApi.as_view(), name="filedownload"),
+    # path('login/', auth.LoginView.as_view(template_name="login.html"), name="login"),
+    path('category/<int:cate_id>', CategoryDetailViewset, name="categorydetail"),
+    path('category', CategoryCreateReadViewset, name="category"),
+    path('category/<int:cate_id>/post', PostCreateReadViewset),
+    path('category/<int:cate_id>/post/<int:post_id>', PostDetailViewset),
     
 ]

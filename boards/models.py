@@ -24,6 +24,7 @@ class Category(models.Model):
     only_superuser = models.BooleanField(default=False)
     
     creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name="category")
+    favorite_user = models.ManyToManyField(User, related_name='favorite_category')
     
     class Meta:
         verbose_name = '게시판 종류'
@@ -46,6 +47,7 @@ class Post(models.Model):
     
     category = models.ForeignKey(Category, null=True, on_delete=models.CASCADE, related_name="post")
     creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name="post")
+    favorite_user = models.ManyToManyField(User, related_name='favorite_post')
     
     class Meta:
         verbose_name = '게시글'
@@ -78,6 +80,7 @@ class Comment(models.Model):
     
     creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comment")
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comment")
+    favorite_user = models.ManyToManyField(User, related_name='favorite_comment')
     
     class Meta:
         verbose_name_plural = '댓글'
@@ -93,6 +96,7 @@ class Reply(models.Model):
     
     creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reply")
     comment = models.ForeignKey(Comment, null=True, on_delete=models.DO_NOTHING, related_name="reply")
+    favorite_user = models.ManyToManyField(User, related_name='favorite_reply')
     
     class Meta:
         verbose_name_plural = '대댓글'
