@@ -1,8 +1,7 @@
 import datetime, jwt
 
 from rest_framework import exceptions
-from rest_framework.authentication import BaseAuthentication
-from django.middleware.csrf import CsrfViewMiddleware
+from rest_framework.authentication import BaseAuthentication, CSRFCheck
 from django.contrib.auth import backends
 from django.db.models import Q
 from django.contrib.auth import get_user_model
@@ -14,9 +13,9 @@ from users.utils import user_record_login
 User = get_user_model()
 
 
-class CSRFCheck(CsrfViewMiddleware):
-    def _reject(self, request, reason):
-        return reason
+# class CSRFCheck(CsrfViewMiddleware):
+#     def _reject(self, request, reason):
+#         return reason
 
 
 class SafeJWTAuthentication(BaseAuthentication):

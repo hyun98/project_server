@@ -13,7 +13,7 @@ from django.db import transaction
 
 from api.mixins import ApiAuthMixin, PublicApiMixin
 
-from boards.serializers import PostDetailSerializer, FileSerializer
+from boards.serializers import FileSerializer
 from boards.models import Category, Post, PostFile
 from users.models import User
 

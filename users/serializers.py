@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
 
 from users.models import Profile
-from boards.serializers import PostListSerializer, CategorySerializer
+from boards.serializers import CategorySerializer
 
 
 User = get_user_model()
@@ -39,7 +39,7 @@ def validate_password12(password1, password2):
 
 class ProfileSerializer(serializers.ModelSerializer):
     favorite_category = CategorySerializer(read_only=True, many=True)
-    favorite_post = PostListSerializer(read_only=True, many=True)
+    # favorite_post = PostListSerializer(read_only=True, many=True)
     
     class Meta:
         model = Profile

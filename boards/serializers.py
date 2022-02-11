@@ -1,107 +1,40 @@
-from django.db.models import Subquery, CharField, OuterRef
 from rest_framework import serializers
+from rest_framework.utils import model_meta
+from rest_framework.exceptions import ValidationError
 from rest_framework.fields import SerializerMethodField
+
+from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
+from django.db import transaction
 
 from boards.models import Category, Post, Comment, PostFile, Reply
 
 
 class CategorySerializer(serializers.ModelSerializer):
     favorite_count = serializers.SerializerMethodField(read_only=True)
+    created_date = serializers.DateTimeField(read_only=True)
     
     class Meta:
         model = Category
         fields = (
-            'id', 'title', 'created_date', 'top_fixed', 'favorite_count'
+            'id', 
+            'title', 
+            'is_anonymous',
+            'created_date',
+            'top_fixed', 
+            'only_superuser',
+            'favorite_count',
+            'creator',
         )
     
     def get_favorite_count(self, obj):
-        try:
-            return obj.favorite_user.count()
-        except:
-            return 0
-
-
-class PostListSerializer(serializers.ModelSerializer):
-    thumbnail = serializers.SerializerMethodField(read_only=True)
-    creator = serializers.SerializerMethodField(read_only=True)
-    favorite_count = serializers.SerializerMethodField(read_only=True)
-    only_superuser = serializers.BooleanField(source="category.only_superuser", read_only=True)
+        return obj.favorite_user.count()
     
-    class Meta:
-        model = Post
-        fields = (
-            'id', 'category', 'title', 'content', 'thumbnail', 
-            'hits', 'created_date', 'modified_date', 'top_fixed',
-            'creator', 'favorite_count', 'only_superuser',
-        )
-    
-    def get_creator(self, obj):
-        try:
-            category = obj.category
-            creator = obj.creator
-            is_anonymous = category.is_anonymous
-            if is_anonymous:
-                return "익명"
-            else:
-                return creator.profile.nickname
-        except:
-            return ''
-    
-    def get_thumbnail(self, obj):
-        try:
-            return obj.thumbnail.url
-        except:
-            return ''
-    
-    def get_favorite_count(self, obj):
-        try:
-            return obj.favorite_user.count()
-        except:
-            return 0
-
-
-class ReplySerializer(serializers.ModelSerializer):
-    creator = serializers.SerializerMethodField(read_only=True)
-    favorite_count = SerializerMethodField(read_only=True)
-    
-    class Meta:
-        model = Reply
-        fields = (
-            'id', 'content', 'creator', 'favorite_count',
-        )
+    def validate(self, attrs):
+        if attrs['title'] is None:
+            raise ValidationError(_("No title"))
         
-    def get_creator(self, obj):
-        is_anonymous = obj.comment.post.category.is_anonymous
-        if is_anonymous:
-            return "익명"
-        else:
-            return obj.creator.profile.nickname
-    
-    def get_favorite_count(self, obj):
-        return obj.favorite_user.all().count()
-
-
-class CommentSerializer(serializers.ModelSerializer):
-    reply = ReplySerializer(many=True, read_only=True)
-    creator = SerializerMethodField(read_only=True)
-    favorite_count = SerializerMethodField(read_only=True)
-    
-    class Meta:
-        model = Comment
-        fields = (
-            'id', 'content', 'creator', 'favorite_count', 'reply', 
-        )
-        
-    def get_creator(self, obj):
-        is_anonymous = obj.post.category.is_anonymous
-        # is_anonymous = True
-        if is_anonymous:
-            return "익명"
-        else:
-            return obj.creator.profile.nickname
-    
-    def get_favorite_count(self, obj):
-        return obj.favorite_user.all().count()
+        return attrs
 
 
 class FileSerializer(serializers.ModelSerializer):
@@ -112,34 +45,38 @@ class FileSerializer(serializers.ModelSerializer):
         )
     
 
-
-class PostDetailSerializer(serializers.ModelSerializer):
-    postfile = FileSerializer(many=True, read_only=True)
-    comment = CommentSerializer(many=True, read_only=True)
-    thumbnail = serializers.SerializerMethodField(read_only=True)
-    creator = serializers.SerializerMethodField(read_only=True)
+class PostSerializer(serializers.ModelSerializer):
     favorite_count = serializers.SerializerMethodField(read_only=True)
+    hits = serializers.IntegerField(read_only=True)
+    created_date = serializers.DateTimeField(read_only=True)
+    modified_date = serializers.DateTimeField(read_only=True)
+    postfile = FileSerializer(read_only=True, many=True)
     
     class Meta:
         model = Post
         fields = (
-            'id', 'thumbnail', 'title', 'content', 'hits', 'created_date', 
-            'modified_date', 'creator', 'favorite_count', 'comment', 'postfile',
+            'id',
+            'title',
+            'content',
+            'thumbnail',
+            'created_date',
+            'hits',
+            'modified_date',
+            'top_fixed',
+            'category',
+            'creator',
+            'favorite_count',
+            'postfile',
         )
     
-    def get_creator(self, obj):
-        is_anonymous = obj.category.is_anonymous
-        if is_anonymous:
-            return "익명"
-        else:
-            return obj.creator.profile.nickname
-    
-    def get_thumbnail(self, obj):
-        try:
-            return obj.thumbnail.url
-        except:
-            return ''
-    
     def get_favorite_count(self, obj):
-        return obj.favorite_user.all().count()
+        return obj.favorite_user.count()
     
+    def validate(self, attrs):
+        if attrs['title'] is None:
+            raise ValidationError(_("No title"))
+        
+        if attrs['content'] is None:
+            raise ValidationError(_("No content"))
+        
+        return attrs
