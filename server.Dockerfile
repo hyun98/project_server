@@ -1,16 +1,13 @@
 FROM python:3.9.0
 
-COPY ./ /home/ubuntu/project_server
+COPY ./ /home/ubuntu/backend-msa/apigateway-auth-service
 
-WORKDIR /home/ubuntu/project_server/
+WORKDIR /home/ubuntu/backend-msa/apigateway-auth-service/
 
-RUN apt-get upgrade && pip3 install --upgrade pip
-
-RUN pip install -r requirements.txt
-
-RUN pip install gunicorn
-
-RUN pip install mysqlclient
+RUN apt-get upgrade && \
+    pip3 install --upgrade pip \
+    pip install -r requirements.txt && \
+    pip install gunicorn && \
+    pip install mysqlclient
 
 EXPOSE 8000
-EXPOSE 8080

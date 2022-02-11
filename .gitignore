@@ -3,12 +3,12 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos,django,python,visualstudiocode
 
 ### Deploy ###
-nginx.conf
-docker-compose.yml
-local.Dockerfile
+# nginx.conf
+# docker-compose.yml
+# local.Dockerfile
 project.crt
 project.key
-local.docker-compose.yml
+# local.docker-compose.yml
 logs
 .coveragerc
 

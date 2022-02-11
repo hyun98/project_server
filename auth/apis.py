@@ -6,11 +6,11 @@ from rest_framework.response import Response
 
 from django.contrib.auth import get_user_model
 from django.conf import settings
+from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
 
 from auth.authenticate import generate_access_token, jwt_login
 from api.mixins import PublicApiMixin
-from django.utils.decorators import method_decorator
 
 
 User = get_user_model()
@@ -23,6 +23,8 @@ class LoginApi(PublicApiMixin, APIView):
         username 과 password를 가지고 login 시도
         key값 : username, password
         """
+        
+        # serializer에서 구현하기
         user = User
         username = request.data.get('username')
         password = request.data.get('password')
